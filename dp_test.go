@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/tsavola/dp/format"
 	"github.com/tsavola/dp/lex"
 	"github.com/tsavola/dp/parse"
 	"github.com/tsavola/dp/source"
@@ -49,6 +50,12 @@ func Test(t *testing.T) {
 					for _, node := range parsed {
 						t.Log(node)
 					}
+				}
+
+				formatted := string(format.File(parsed))
+
+				if false {
+					t.Logf("formatted:\n%s", formatted)
 				}
 			})
 		}

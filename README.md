@@ -6,6 +6,9 @@ so that memory management can be automatic, simple and fast.
 The language has null (nil) pointers.  Memory access operations don't require
 elaborate syntax.
 
+The `dpfmt` formatting tool is very lenient.  Therefore source code files stay
+consistently formatted, but it's easy to write them.
+
 
 ## Details
 
