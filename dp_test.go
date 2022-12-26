@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/tsavola/dp/lex"
+	"github.com/tsavola/dp/parse"
 	"github.com/tsavola/dp/source"
 
 	. "import.name/pan/mustcheck"
@@ -36,6 +37,18 @@ func Test(t *testing.T) {
 						s += tok.Source
 					}
 					t.Log(s)
+				}
+
+				parsed, err := parse.File(tokens)
+				err = source.ErrorWithPositionPrefix(err, "")
+				if err != nil {
+					t.Fatalf("parse error:\n%v", err)
+				}
+
+				if false {
+					for _, node := range parsed {
+						t.Log(node)
+					}
 				}
 			})
 		}
