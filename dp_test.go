@@ -9,6 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/tsavola/dp/lex"
+	"github.com/tsavola/dp/source"
+
 	. "import.name/pan/mustcheck"
 )
 
@@ -19,6 +22,21 @@ func Test(t *testing.T) {
 
 			t.Run(name, func(t *testing.T) {
 				input := string(Must(os.ReadFile(filename)))
+
+				tokens, err := lex.File(source.Location(filename), input)
+				err = source.ErrorWithPositionPrefix(err, "")
+				if err != nil {
+					t.Fatalf("tokenization error:\n%v", err)
+				}
+
+				if false {
+					s := "tokens:\n"
+					for _, tok := range tokens {
+						s += "·"
+						s += tok.Source
+					}
+					t.Log(s)
+				}
 			})
 		}
 	}
