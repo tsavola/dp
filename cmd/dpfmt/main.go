@@ -10,8 +10,10 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/tsavola/dp/ast"
 	"github.com/tsavola/dp/format"
 	"github.com/tsavola/dp/internal/dpfmt"
+	"github.com/tsavola/dp/internal/revise"
 	"github.com/tsavola/dp/lex"
 	"github.com/tsavola/dp/parse"
 	"github.com/tsavola/dp/source"
@@ -27,6 +29,7 @@ func main() {
 	}
 
 	var (
+		old   = flag.Bool("old", false, "parse old language version")
 		diff  = flag.Bool("d", false, "display diffs instead of rewriting files")
 		write = flag.Bool("w", false, "write result to (source) file instead of stdout")
 	)
@@ -39,7 +42,7 @@ func main() {
 	filename := flag.Arg(0)
 
 	err := pan.Recover(func() {
-		program(filename, *diff, *write)
+		program(filename, *old, *diff, *write)
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, source.ErrorWithPositionPrefix(err, filename))
@@ -47,10 +50,17 @@ func main() {
 	}
 }
 
-func program(filename string, diff, write bool) {
+func program(filename string, old, diff, write bool) {
 	pos := source.Location(filename)
 	input := string(Must(os.ReadFile(filename)))
-	parsed := Must(parse.File(Must(lex.File(pos, input))))
+
+	var parsed []ast.FileChild
+	if !old {
+		parsed = Must(parse.File(Must(lex.File(pos, input))))
+	} else {
+		parsed = Must(revise.File(pos, input))
+	}
+
 	output := format.File(parsed)
 
 	if diff {
