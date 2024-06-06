@@ -192,7 +192,7 @@ func (x Imports) Pos() source.Position    { return x.Position }
 func (x Imports) EndPos() source.Position { return x.End }
 
 func (x Imports) String() string {
-	s := "imports ("
+	s := "imports {"
 
 	delim := false
 	for _, node := range x.Imports {
@@ -200,7 +200,7 @@ func (x Imports) String() string {
 			func(Comment) {},
 			func(node Import) {
 				if delim {
-					s += ", "
+					s += "; "
 				}
 				s += node.stringInList()
 				delim = true
@@ -208,7 +208,7 @@ func (x Imports) String() string {
 		)
 	}
 
-	return s + ")"
+	return s + "}"
 }
 
 type Parameter struct {
