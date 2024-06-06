@@ -121,7 +121,7 @@ func parseFunctionDef(s scan) (scan, ast.FileChild) {
 
 	s, results := parse(s,
 		func(s scan) (scan, []ast.TypeListChild) {
-			return parseNakedList(s, false,
+			return parseNakedList(s, token.BraceLeft,
 				parseCommaInTypeList,
 				parseTypeSpecInTypeList,
 			)
@@ -191,7 +191,7 @@ func parseImport(s scan, requireKeyword bool) (scan, ast.Import) {
 			parseNewlineInIdentList,
 		)
 	} else {
-		s, names = parseNakedList(s, false,
+		s, names = parseNakedList(s, 0,
 			parseCommaInIdentList,
 			parseIdentifierInIdentList,
 		)
@@ -220,7 +220,7 @@ func parseImports(s scan) (scan, ast.FileChild) {
 
 	switch {
 	case s.peek().Kind == token.String:
-		s, imports = parseNakedList(s, false,
+		s, imports = parseNakedList(s, 0,
 			parseCommaInImportList,
 			parseImportPathInImportList,
 		)

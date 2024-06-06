@@ -43,18 +43,13 @@ func parse[ScanState poser, Result any](s ScanState, parsers ...func(ScanState) 
 	panic(pan.Wrap(position.NewError(s.pos(), "syntax error", errs...)))
 }
 
-func parseNakedList[T comparable](s scan, assignment bool, parsers ...func(scan) (scan, T)) (scan, []T) {
+func parseNakedList[T comparable](s scan, extraTerminator token.Kind, parsers ...func(scan) (scan, T)) (scan, []T) {
 	var results []T
 
 	for {
 		switch s.peek().Kind {
-		case token.BraceLeft, token.BraceRight, token.Colon, token.Comment, token.Define, token.Newline, token.Semicolon:
+		case token.BraceRight, token.Colon, token.Comment, token.Define, token.Newline, token.Semicolon, extraTerminator:
 			return s, results
-
-		case token.Assign:
-			if assignment {
-				return s, results
-			}
 		}
 
 		var r T

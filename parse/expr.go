@@ -109,7 +109,7 @@ func parseExprList(s scan) (scan, []ast.ExprListChild) {
 			parseNewlineInExprList,
 		)
 	} else {
-		return parseNakedList(s, false,
+		return parseNakedList(s, 0,
 			parseCommaInExprList,
 			parseExpressionInExprList,
 		)

@@ -29,7 +29,7 @@ func parseStatements(s scan) (scan, []ast.BlockChild) {
 }
 
 func parseAssign(s scan) (scan, ast.BlockChild) {
-	s, names := parseNakedList(s, true,
+	s, names := parseNakedList(s, token.Assign,
 		parseAssignerDereferenceInAssignList,
 		parseCallInAssignList,
 		parseCommaInAssignList,
@@ -103,7 +103,7 @@ func parseReturn(s scan) (scan, ast.BlockChild) {
 
 	s, values := parse(s,
 		func(s scan) (scan, []ast.ExprListChild) {
-			return parseNakedList(s, false,
+			return parseNakedList(s, 0,
 				parseCommaInExprList,
 				parseExpressionInExprList,
 			)
@@ -126,7 +126,7 @@ func parseReturn(s scan) (scan, ast.BlockChild) {
 func parseVariableDecl(s scan) (scan, ast.BlockChild) {
 	pos := s.pos()
 
-	s, names := parseNakedList(s, false,
+	s, names := parseNakedList(s, 0,
 		parseCommaString,
 		parseVariableName,
 	)
@@ -145,7 +145,7 @@ func parseVariableDecl(s scan) (scan, ast.BlockChild) {
 func parseVariableDef(s scan) (scan, ast.BlockChild) {
 	pos := s.pos()
 
-	s, names := parseNakedList(s, false,
+	s, names := parseNakedList(s, 0,
 		parseCommaString,
 		parseVariableName,
 	)
