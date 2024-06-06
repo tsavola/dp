@@ -43,6 +43,9 @@ func parseAssign(s scan) (scan, ast.BlockChild) {
 	s.take(token.Assign, "assign: operator expected")
 
 	s, values := parseExprList(s)
+	if len(values) == 0 {
+		pan.Panic(newError(s.pos(), "assign: empty list"))
+	}
 
 	return s, ast.Assign{names[0].Pos(), names, values, s.last}
 }
