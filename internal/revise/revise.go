@@ -7,13 +7,13 @@ import (
 	new "github.com/tsavola/dp/ast"
 	old "github.com/tsavola/dp/ast"
 	newfield "github.com/tsavola/dp/field"
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/internal/sync"
 	oldlex "github.com/tsavola/dp/lex"
 	oldparse "github.com/tsavola/dp/parse"
 	"github.com/tsavola/dp/source"
-	"import.name/pan"
 
-	. "import.name/pan/mustcheck"
+	. "github.com/tsavola/dp/internal/pan/mustcheck"
 )
 
 func File(pos source.Position, input string) (news []new.FileChild, err error) {

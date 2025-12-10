@@ -9,9 +9,9 @@ import (
 
 	"github.com/tsavola/dp/ast"
 	"github.com/tsavola/dp/field"
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/source"
 	"github.com/tsavola/dp/token"
-	"import.name/pan"
 )
 
 func File(tokens []token.Token) ([]ast.FileChild, error) {

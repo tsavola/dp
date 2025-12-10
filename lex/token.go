@@ -7,9 +7,9 @@ package lex
 import (
 	"unicode"
 
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/source"
 	"github.com/tsavola/dp/token"
-	"import.name/pan"
 )
 
 func File(pos source.Position, text string) ([]token.Token, error) {

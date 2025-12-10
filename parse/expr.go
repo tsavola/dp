@@ -5,8 +5,8 @@ package parse
 
 import (
 	"github.com/tsavola/dp/ast"
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/token"
-	"import.name/pan"
 )
 
 func parseExpressionInBlock(s scan) (scan, ast.BlockChild) {

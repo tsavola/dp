@@ -5,8 +5,8 @@ package parse
 
 import (
 	"github.com/tsavola/dp/ast"
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/token"
-	"import.name/pan"
 )
 
 func parsePrefixOperator(s scan) (scan, ast.UnaryOp) {

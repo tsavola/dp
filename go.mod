@@ -1,7 +1,5 @@
 module github.com/tsavola/dp
 
-go 1.22
+go 1.24
 
-require (
-	import.name/pan v0.2.0
-)
+require import.name/pan v0.3.0

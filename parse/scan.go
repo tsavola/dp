@@ -4,9 +4,9 @@
 package parse
 
 import (
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/source"
 	"github.com/tsavola/dp/token"
-	"import.name/pan"
 )
 
 // scan state.

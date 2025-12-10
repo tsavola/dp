@@ -6,10 +6,10 @@ package parse
 import (
 	"errors"
 
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/internal/position"
 	"github.com/tsavola/dp/source"
 	"github.com/tsavola/dp/token"
-	"import.name/pan"
 )
 
 type poser interface {

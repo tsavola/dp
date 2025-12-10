@@ -14,7 +14,7 @@ import (
 	"github.com/tsavola/dp/parse"
 	"github.com/tsavola/dp/source"
 
-	. "import.name/pan/mustcheck"
+	. "github.com/tsavola/dp/internal/pan/mustcheck"
 )
 
 func Test(t *testing.T) {
