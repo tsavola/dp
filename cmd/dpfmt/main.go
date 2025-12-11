@@ -8,10 +8,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/tsavola/dp/ast"
 	"github.com/tsavola/dp/format"
+	"github.com/tsavola/dp/internal/difftool"
 	"github.com/tsavola/dp/internal/dpfmt"
 	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/internal/revise"
@@ -64,14 +64,7 @@ func program(filename string, old, diff, write bool) {
 	output := format.File(parsed)
 
 	if diff {
-		cmd := exec.Command("diff", "-u", filename, "/dev/stdin")
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		w := Must(cmd.StdinPipe())
-		Check(cmd.Start())
-		Must(w.Write(output))
-		Check(w.Close())
-		cmd.Wait() // diff exit status is nonzero if there are differences.
+		difftool.MustDiff(filename, output)
 	} else if !write {
 		Must(os.Stdout.Write(output))
 		return
