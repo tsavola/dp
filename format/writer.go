@@ -13,6 +13,12 @@ type writer struct {
 	*bytes.Buffer
 }
 
+// lastRune returns utf8.RuneError there is none.
+func (w writer) lastRune() rune {
+	r, _ := utf8.DecodeLastRune(w.Bytes())
+	return r
+}
+
 func (w writer) currentLineLen() int {
 	s := w.String()
 	i := strings.LastIndex(s, "\n")

@@ -10,6 +10,9 @@ import (
 func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight bool) {
 	ast.VisitExpr(node,
 		func(node ast.Address) {
+			if w.lastRune() == '&' { // Prevent &&
+				w.WriteString(" ")
+			}
 			w.WriteString("&")
 			formatExpr(w, level, node.Expr, ast.UltimatePrecedence, tight)
 		},
@@ -94,6 +97,9 @@ func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight b
 			if node.Op == ast.OpIdentity {
 				formatExpr(w, level, node.Expr, parentPrec, tight)
 			} else {
+				if node.Op == ast.OpComplement && w.lastRune() == '&' { // Prevent &^
+					w.WriteString(" ")
+				}
 				w.WriteString(node.Op.String())
 				formatExpr(w, level, node.Expr, ast.UltimatePrecedence, tight)
 			}
