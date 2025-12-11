@@ -6,6 +6,7 @@ package lex
 import (
 	"unicode/utf8"
 
+	"github.com/tsavola/dp/internal/pan"
 	"github.com/tsavola/dp/source"
 )
 
@@ -25,11 +26,11 @@ func (s *scan) peek() rune {
 	return r
 }
 
-// advance returns 0 on EOF.  Zero code point is returned as utf8.RuneError.
-func (s *scan) advance() rune {
+// advance must only be called after peek returned a nonzero rune.
+func (s *scan) advance() {
 	c, n := s.peekSize()
-	if c == utf8.RuneError {
-		return c
+	if c == 0 {
+		panic("advanced on EOF")
 	}
 
 	if c == '\n' {
@@ -39,8 +40,6 @@ func (s *scan) advance() rune {
 		s.Column++
 	}
 	s.ByteOffset += n
-
-	return c
 }
 
 // peekSize returns 0 on EOF.  Zero code point is returned as utf8.RuneError.
@@ -50,8 +49,11 @@ func (s *scan) peekSize() (rune, int) {
 	}
 
 	c, n := utf8.DecodeRuneInString(s.text[s.ByteOffset:])
-	if c == 0 || c == utf8.RuneError {
-		return utf8.RuneError, 0
+	if c == utf8.RuneError {
+		pan.Panic(decodeError(s.pos()))
+	}
+	if c == 0 {
+		return utf8.RuneError, n
 	}
 
 	return c, n
