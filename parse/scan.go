@@ -17,6 +17,9 @@ type scan struct {
 
 func (s scan) pos() source.Position {
 	s.peek() // Skip space.
+	if len(s.tokens) == 0 {
+		return source.Position{}
+	}
 	return s.tokens[0].Pos()
 }
 
