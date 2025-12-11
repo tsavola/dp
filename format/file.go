@@ -13,6 +13,10 @@ import (
 )
 
 func File(nodes []ast.FileChild) []byte {
+	if len(nodes) == 0 {
+		return nil
+	}
+
 	size := nodes[len(nodes)-1].EndPos().ByteOffset
 	w := writer{bytes.NewBuffer(make([]byte, 0, size+size/4))}
 
