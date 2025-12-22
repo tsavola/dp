@@ -48,7 +48,7 @@ func File(nodes []ast.FileChild) []byte {
 			if curr != nil && prev != nil {
 				if prev, ok := (*prev).(ast.ConstantDef); ok {
 					if curr, ok := (*curr).(ast.ConstantDef); ok {
-						if curr.Line-prev.Line <= 1 && curr.Public == prev.Public {
+						if curr.Line-prev.End.Line <= 1 && curr.Public == prev.Public {
 							gap = false
 						}
 					}
