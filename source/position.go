@@ -4,10 +4,6 @@
 // Package source describes source code locations.
 package source
 
-import (
-	"fmt"
-)
-
 type Position struct {
 	Path       string
 	Line       int // 1-based
@@ -21,8 +17,4 @@ func Location(path string) Position {
 		Line:   1,
 		Column: 1,
 	}
-}
-
-func (p Position) String() string {
-	return fmt.Sprintf("%s:%d:%d", p.Path, p.Line, p.Column)
 }
