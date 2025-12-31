@@ -141,7 +141,7 @@ func File(nodes []ast.FileChild) []byte {
 							w.WriteString(node.ReceiverName)
 							w.WriteString(" ")
 						}
-						w.WriteString(node.ReceiverType.String())
+						w.WriteString(node.ReceiverType.Type.String())
 						w.WriteString(") ")
 					}
 					w.WriteString(node.FuncName)
@@ -167,11 +167,7 @@ func File(nodes []ast.FileChild) []byte {
 							func(ast.Import) {},
 						)
 					}
-					if empty {
-						w.WriteString(node.String())
-					} else {
-						formatTypeDef(w, node)
-					}
+					formatTypeDefBody(w, node, empty)
 					w.WriteString("\n")
 				},
 			)
@@ -200,16 +196,16 @@ func formatFunctionParams(w writer, def ast.FunctionDef) {
 			if i > 0 {
 				w.WriteString(", ")
 			}
-			if i < len(params)-1 && param.Type.Type.Equal(params[i+1].Type.Type) {
-				w.WriteString(param.ParamName)
-			} else {
-				w.WriteString(param.String())
+			w.WriteString(param.ParamName)
+			if i == len(params)-1 || !param.Type.Type.Equal(params[i+1].Type.Type) {
+				w.WriteString(" ")
+				w.WriteString(param.Type.String())
 			}
 		}
 	} else {
 		columnify := func(node ast.ParamListChild) []string {
 			if node, ok := node.(ast.Parameter); ok {
-				return []string{node.ParamName, node.Type.String()}
+				return []string{node.ParamName, node.Type.Type.String()}
 			}
 			return nil
 		}
@@ -268,7 +264,7 @@ func formatFunctionResults(w writer, def ast.FunctionDef) {
 		w.WriteString("() ")
 
 	case !comments && len(specs) == 1:
-		w.WriteString(specs[0].String())
+		w.WriteString(specs[0].Type.String())
 		w.WriteString(" ")
 
 	case !comments && specs[0].Line == def.ParamsEnd.Line:
@@ -278,7 +274,7 @@ func formatFunctionResults(w writer, def ast.FunctionDef) {
 			if i > 0 {
 				w.WriteString(", ")
 			}
-			w.WriteString(spec.String())
+			w.WriteString(spec.Type.String())
 		}
 
 		w.WriteString(") ")
@@ -345,37 +341,41 @@ func trimFunctionBody(def ast.FunctionDef) []ast.BlockChild {
 	return nodes
 }
 
-func formatTypeDef(w writer, node ast.TypeDef) {
+func formatTypeDefBody(w writer, node ast.TypeDef, empty bool) {
 	if node.Public {
 		w.WriteString("pub ")
 	}
 	w.WriteString(node.TypeName)
 	w.WriteString(" {")
 
-	columnify := func(node ast.FieldListChild) []string {
-		if node, ok := node.(ast.Field); ok {
-			values := make([]string, 0, 3)
-			values = append(values, node.FieldName)
-			values = append(values, node.Type.String())
-			if node.Access != field.AccessHidden {
-				values = append(values, node.Access.String())
+	if !empty {
+		columnify := func(node ast.FieldListChild) []string {
+			if node, ok := node.(ast.Field); ok {
+				values := make([]string, 0, 3)
+				values = append(values, node.FieldName)
+				values = append(values, node.Type.Type.String())
+				if node.Access != field.AccessHidden {
+					values = append(values, node.Access.String())
+				}
+				return values
 			}
-			return values
+			return nil
 		}
-		return nil
+
+		var (
+			columnWidths   = getColumnWidths(node.Fields, columnify)
+			commentOffsets = make(map[int]*int)
+		)
+
+		base := w.Len()
+		formatTypeFields(w, node, columnify, columnWidths, commentOffsets)
+		w.Truncate(base)
+		formatTypeFields(w, node, columnify, columnWidths, commentOffsets)
+
+		w.WriteString("\n")
 	}
 
-	var (
-		columnWidths   = getColumnWidths(node.Fields, columnify)
-		commentOffsets = make(map[int]*int)
-	)
-
-	base := w.Len()
-	formatTypeFields(w, node, columnify, columnWidths, commentOffsets)
-	w.Truncate(base)
-	formatTypeFields(w, node, columnify, columnWidths, commentOffsets)
-
-	w.WriteString("\n}")
+	w.WriteString("}")
 }
 
 func formatTypeFields(w writer, def ast.TypeDef, columnify func(ast.FieldListChild) []string, columnWidths map[int][]*int, commentOffsets map[int]*int) {

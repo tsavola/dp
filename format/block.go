@@ -58,7 +58,7 @@ func formatStatements(
 					if i > 0 {
 						w.WriteString(", ")
 					}
-					w.WriteString(node.String())
+					formatAssignListChild(w, node)
 				}
 				w.WriteString(" = ")
 				formatExprList(w, level+1, node.Line, node.Subjects, false)
@@ -120,7 +120,7 @@ func formatStatements(
 				if node.Type == nil {
 					w.WriteString("auto")
 				} else {
-					w.WriteString(node.Type.String())
+					w.WriteString(node.Type.Type.String())
 				}
 			},
 
@@ -138,4 +138,25 @@ func formatStatements(
 
 		prevLine = node.EndPos().Line
 	}
+}
+
+func formatAssignListChild(w writer, node ast.AssignListChild) {
+	ast.VisitAssignListChild(node,
+		func(node ast.AssignerDereference) {
+			formatAssignerDereference(w, node)
+		},
+		func(node ast.Call) {
+			w.WriteString(node.Name.String())
+			formatExprList(w, 0, node.Pos().Line, node.Args, true)
+		},
+		func(node ast.Index) {
+			w.WriteString(node.Name.String())
+			w.WriteString("[")
+			formatExpr(w, 0, node.Index, 0, true)
+			w.WriteString("]")
+		},
+		func(node ast.Selector) {
+			w.WriteString(node.String())
+		},
+	)
 }

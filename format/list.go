@@ -50,7 +50,7 @@ func formatExprListOneLine(w writer, nodes []ast.ExprListChild) {
 		}
 
 		ast.VisitExprListChild(node,
-			func(node ast.AssignerDereference) { w.WriteString(node.String()) },
+			func(node ast.AssignerDereference) { formatAssignerDereference(w, node) },
 			func(ast.Comment) {},
 			func(node ast.Expression) { formatExpr(w, 0, node.Expr, 0, false) },
 		)

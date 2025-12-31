@@ -110,3 +110,9 @@ func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight b
 		},
 	)
 }
+
+func formatAssignerDereference(w writer, node ast.AssignerDereference) {
+	w.WriteString("(")
+	w.WriteString(node.Name)
+	w.WriteString(")")
+}
