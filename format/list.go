@@ -58,6 +58,7 @@ func formatExprListOneLine(w writer, nodes []ast.ExprListChild) {
 }
 
 func formatExprListMultiLine(w writer, level, startLine int, nodes []ast.ExprListChild, commentOffsets map[int]*int) {
+	first := true
 	prevLine := startLine
 
 	for _, node := range nodes {
@@ -65,12 +66,16 @@ func formatExprListMultiLine(w writer, level, startLine int, nodes []ast.ExprLis
 
 		ast.VisitExprListChild(node,
 			func(node ast.AssignerDereference) {
-				w.WriteString(node.String())
+				formatAssignerDereference(w, node)
 				w.WriteString(",")
 			},
 
 			func(node ast.Comment) {
-				formatComment(w, 1, startLine, node, commentOffsets)
+				if first {
+					formatCommentAlone(w, node)
+				} else {
+					formatComment(w, 1, node, commentOffsets)
+				}
 			},
 
 			func(node ast.Expression) {
@@ -79,6 +84,7 @@ func formatExprListMultiLine(w writer, level, startLine int, nodes []ast.ExprLis
 			},
 		)
 
+		first = false
 		prevLine = node.EndPos().Line
 	}
 }

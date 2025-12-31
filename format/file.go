@@ -238,7 +238,7 @@ func formatFunctionParamsMultiLine(w writer, def ast.FunctionDef, columnify func
 
 		ast.VisitParamListChild(node,
 			func(node ast.Comment) {
-				formatComment(w, 1, def.Line, node, commentOffsets)
+				formatComment(w, 1, node, commentOffsets)
 			},
 
 			func(node ast.Parameter) {
@@ -305,7 +305,7 @@ func formatFunctionResultsMultiLine(w writer, def ast.FunctionDef, commentOffset
 
 		ast.VisitTypeListChild(node,
 			func(node ast.Comment) {
-				formatComment(w, 1, def.ParamsEnd.Line, node, commentOffsets)
+				formatComment(w, 1, node, commentOffsets)
 			},
 
 			func(node ast.TypeSpec) {
@@ -385,7 +385,7 @@ func formatTypeFields(w writer, def ast.TypeDef, columnify func(ast.FieldListChi
 		indentNode(w, 1, prevLine, node)
 
 		ast.VisitFieldListChild(node,
-			func(node ast.Comment) { formatComment(w, 1, def.Line, node, commentOffsets) },
+			func(node ast.Comment) { formatComment(w, 1, node, commentOffsets) },
 			func(node ast.Field) { formatColumns(w, columnify(node), columnWidths[node.Line]) },
 			func(ast.Import) {},
 		)

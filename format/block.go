@@ -73,7 +73,7 @@ func formatStatements(
 			},
 
 			func(node ast.Comment) {
-				formatComment(w, level, startLine, node, commentOffsets)
+				formatComment(w, level, node, commentOffsets)
 			},
 
 			func(node ast.Continue) {

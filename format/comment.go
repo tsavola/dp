@@ -20,7 +20,9 @@ func splitCommentedNodes[T ast.Node, R ast.Node](nodes []T, splitOnGap bool) []c
 	var groups []commentedNode[R]
 	var g commentedNode[R]
 
-	for i, curr := range nodes {
+	for i := 0; i < len(nodes); i++ {
+		curr := nodes[i]
+
 		switch x := ast.Node(curr).(type) {
 		case ast.Comment:
 			g.head = append(g.head, x)
@@ -47,6 +49,12 @@ func splitCommentedNodes[T ast.Node, R ast.Node](nodes []T, splitOnGap bool) []c
 			if step == 0 {
 				if c, ok := ast.Node(next).(ast.Comment); ok {
 					switch ast.Node(curr).(type) {
+					case ast.ConstantDef:
+						// Preserve comment on same line.
+						// TODO: preserve also on following lines?
+						g.tail = []ast.Comment{c}
+						i++
+
 					case ast.Identifier:
 						// Preserve comments on same and following lines.
 						for ok {
@@ -93,29 +101,31 @@ func splitCommentedNodes[T ast.Node, R ast.Node](nodes []T, splitOnGap bool) []c
 }
 
 // formatComment grows offsets if necessary.
-func formatComment(w writer, level, bodyStartLine int, node ast.Comment, offsets map[int]*int) {
-	if node.Line > bodyStartLine {
-		lineLen := w.currentLineLen()
+func formatComment(w writer, level int, node ast.Comment, offsets map[int]*int) {
+	lineLen := w.currentLineLen()
 
-		if off := offsets[node.Line]; off != nil {
-			pad(w, *off-lineLen)
-		} else {
-			off = offsets[node.Line-1]
+	if off := offsets[node.Line]; off != nil {
+		pad(w, *off-lineLen)
+	} else {
+		off = offsets[node.Line-1]
 
-			switch {
-			case off == nil: // Previous line has no comment.
-				off = &lineLen
+		switch {
+		case off == nil: // Previous line has no comment.
+			off = &lineLen
 
-			case *off <= level: // Previous line has only a comment.
-				off = &lineLen
+		case *off <= level: // Previous line has only a comment.
+			off = &lineLen
 
-			case *off < lineLen:
-				*off = lineLen
-			}
-
-			offsets[node.Line] = off
+		case *off < lineLen:
+			*off = lineLen
 		}
+
+		offsets[node.Line] = off
 	}
 
+	formatCommentAlone(w, node)
+}
+
+func formatCommentAlone(w writer, node ast.Comment) {
 	w.WriteString(strings.TrimSpace(node.Source))
 }
