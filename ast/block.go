@@ -18,7 +18,7 @@ func (Expression) blockChild()               {}
 func (Expression) exprListChild()            {}
 func (x Expression) Pos() source.Position    { return x.Expr.Pos() }
 func (x Expression) EndPos() source.Position { return x.Expr.EndPos() }
-func (x Expression) String() string          { return x.Expr.String() }
+func (x Expression) Dump() string            { return "Expression{" + x.Expr.Dump() + "}" }
 
 type Assign struct {
 	source.Position
@@ -32,24 +32,24 @@ func (Assign) blockChild()               {}
 func (x Assign) Pos() source.Position    { return x.Position }
 func (x Assign) EndPos() source.Position { return x.End }
 
-func (x Assign) String() string {
-	var s string
+func (x Assign) Dump() string {
+	s := "Assign{"
 
 	delim := ""
 	for _, node := range x.Objects {
-		s += delim + node.String()
+		s += delim + node.Dump()
 		delim = ", "
 	}
 
 	delim = " = "
 	for _, node := range x.Subjects {
 		if !IsComment(node) {
-			s += delim + node.String()
+			s += delim + node.Dump()
 			delim = ", "
 		}
 	}
 
-	return s
+	return s + "}"
 }
 
 type Block struct {
@@ -63,8 +63,8 @@ func (Block) blockChild()               {}
 func (x Block) Pos() source.Position    { return x.Position }
 func (x Block) EndPos() source.Position { return x.End }
 
-func (x Block) String() string {
-	s := "{"
+func (x Block) Dump() string {
+	s := "Block{"
 
 	delim := false
 	for _, node := range x.Body {
@@ -72,7 +72,7 @@ func (x Block) String() string {
 			if delim {
 				s += "; "
 			}
-			s += node.String()
+			s += node.Dump()
 			delim = true
 		}
 	}
@@ -89,7 +89,7 @@ func (Break) Node() string              { return "break" }
 func (Break) blockChild()               {}
 func (x Break) Pos() source.Position    { return x.Position }
 func (x Break) EndPos() source.Position { return x.End }
-func (Break) String() string            { return "break" }
+func (Break) Dump() string              { return "Break" }
 
 type Continue struct {
 	source.Position
@@ -100,7 +100,7 @@ func (Continue) Node() string              { return "continue" }
 func (Continue) blockChild()               {}
 func (x Continue) Pos() source.Position    { return x.Position }
 func (x Continue) EndPos() source.Position { return x.End }
-func (Continue) String() string            { return "continue" }
+func (Continue) Dump() string              { return "Continue" }
 
 type For struct {
 	source.Position
@@ -115,12 +115,12 @@ func (For) blockChild()               {}
 func (x For) Pos() source.Position    { return x.Position }
 func (x For) EndPos() source.Position { return x.End }
 
-func (x For) String() string {
-	s := "for "
+func (x For) Dump() string {
+	s := "For{"
 	if x.Test != nil {
-		s += x.Test.String() + " "
+		s += x.Test.Dump() + " "
 	}
-	return s + Block{x.Position, x.Body, x.End}.String()
+	return s + Block{x.Position, x.Body, x.End}.Dump() + "}"
 }
 
 type If struct {
@@ -138,12 +138,12 @@ func (If) blockChild()               {}
 func (x If) Pos() source.Position    { return x.Position }
 func (x If) EndPos() source.Position { return x.End }
 
-func (x If) String() string {
-	s := "if " + x.Test.String() + " " + Block{x.Position, x.Then, x.ThenEnd}.String()
+func (x If) Dump() string {
+	s := "If{" + x.Test.Dump() + " " + Block{x.Position, x.Then, x.ThenEnd}.Dump()
 	if len(x.Else) > 0 {
-		s += " else " + Block{x.ThenEnd, x.Else, x.End}.String()
+		s += " else " + Block{x.ThenEnd, x.Else, x.End}.Dump()
 	}
-	return s
+	return s + "}"
 }
 
 type Return struct {
@@ -157,25 +157,25 @@ func (Return) blockChild()               {}
 func (x Return) Pos() source.Position    { return x.Position }
 func (x Return) EndPos() source.Position { return x.End }
 
-func (x Return) String() string {
-	s := "return"
+func (x Return) Dump() string {
+	s := "Return{"
 
 	delim := " "
 	for _, node := range x.Values {
 		VisitExprListChild(node,
 			func(node AssignerDereference) {
-				s += delim + node.String()
+				s += delim + node.Dump()
 				delim = ", "
 			},
 			func(Comment) {},
 			func(node Expression) {
-				s += delim + node.String()
+				s += delim + node.Dump()
 				delim = ", "
 			},
 		)
 	}
 
-	return s
+	return s + "}"
 }
 
 type VariableDecl struct {
@@ -189,15 +189,15 @@ func (VariableDecl) Node() string              { return "variable declaration" }
 func (VariableDecl) blockChild()               {}
 func (x VariableDecl) Pos() source.Position    { return x.Position }
 func (x VariableDecl) EndPos() source.Position { return x.End }
-func (x VariableDecl) String() string          { return strings.Join(x.row(), " ") }
+func (x VariableDecl) Dump() string            { return "VariableDecl{" + strings.Join(x.dumpRow(), " ") + "}" }
 
-func (x VariableDecl) row() []string {
+func (x VariableDecl) dumpRow() []string {
 	typeName := "auto"
 	if x.Type != nil {
-		typeName = x.Type.String()
+		typeName = x.Type.Dump()
 	}
 
-	return []string{formatNameList(x.Names), ":", typeName}
+	return []string{dumpNameList(x.Names), ":", typeName}
 }
 
 type VariableDef struct {
@@ -211,30 +211,30 @@ func (VariableDef) Node() string              { return "variable definition" }
 func (VariableDef) blockChild()               {}
 func (x VariableDef) Pos() source.Position    { return x.Position }
 func (x VariableDef) EndPos() source.Position { return x.End }
-func (x VariableDef) String() string          { return strings.Join(x.row(), " ") }
+func (x VariableDef) Dump() string            { return "VariableDef{" + strings.Join(x.dumpRow(), " ") + "}" }
 
-func (x VariableDef) row() []string {
+func (x VariableDef) dumpRow() []string {
 	var exprs string
 	var delim string
 
 	for _, node := range x.Values {
 		VisitExprListChild(node,
 			func(node AssignerDereference) {
-				exprs += delim + node.String()
+				exprs += delim + node.Dump()
 				delim = ", "
 			},
 			func(Comment) {},
 			func(node Expression) {
-				exprs += delim + node.String()
+				exprs += delim + node.Dump()
 				delim = ", "
 			},
 		)
 	}
 
-	return []string{formatNameList(x.Names), ":=", exprs}
+	return []string{dumpNameList(x.Names), ":=", exprs}
 }
 
-func formatNameList(names []string) string {
+func dumpNameList(names []string) string {
 	var s string
 	var delim string
 

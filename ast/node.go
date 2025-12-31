@@ -12,7 +12,7 @@ type Node interface {
 	Node() string
 	Pos() source.Position
 	EndPos() source.Position
-	String() string
+	Dump() string
 }
 
 type AssignListChild interface {

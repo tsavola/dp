@@ -63,4 +63,4 @@ func (TypeSpec) Node() string              { return "type specification" }
 func (TypeSpec) typeListChild()            {}
 func (x TypeSpec) Pos() source.Position    { return x.Position }
 func (x TypeSpec) EndPos() source.Position { return x.End }
-func (x TypeSpec) String() string          { return x.Type.String() }
+func (x TypeSpec) Dump() string            { return "TypeSpec{" + x.Type.String() + "}" }

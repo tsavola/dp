@@ -64,6 +64,10 @@ func (op BinaryOp) Precedence() int {
 	panic("invalid binary operator")
 }
 
+func (op BinaryOp) Dump() string {
+	return "BinaryOp{" + op.String() + "}"
+}
+
 func (op BinaryOp) String() string {
 	return token.Kind(op).String()
 }
@@ -76,6 +80,10 @@ const (
 	OpComplement = UnaryOp(token.Caret)
 	OpNot        = UnaryOp(token.Exclamation)
 )
+
+func (op UnaryOp) Dump() string {
+	return "UnaryOp{" + op.String() + "}"
+}
 
 func (op UnaryOp) String() string {
 	return token.Kind(op).String()

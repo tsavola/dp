@@ -27,7 +27,7 @@ func (Comment) paramListChild()           {}
 func (Comment) typeListChild()            {}
 func (x Comment) Pos() source.Position    { return x.Position }
 func (x Comment) EndPos() source.Position { return position.After(x.Position, x.Source) }
-func (x Comment) String() string          { return x.Source }
+func (x Comment) Dump() string            { return "Comment{" + x.Source + "}" }
 
 func IsComment(node Node) bool {
 	_, ok := node.(Comment)
@@ -48,12 +48,12 @@ func (x ConstantDef) Pos() source.Position    { return x.Position }
 func (x ConstantDef) EndPos() source.Position { return x.End }
 func (x ConstantDef) Name() string            { return x.ConstName }
 
-func (x ConstantDef) String() string {
-	s := x.ConstName + " = " + x.Value.String()
+func (x ConstantDef) Dump() string {
+	s := x.ConstName + " = " + x.Value.Dump()
 	if x.Public {
 		s = "pub " + s
 	}
-	return s
+	return "ConstantDef{" + s + "}"
 }
 
 type FunctionDef struct {
@@ -76,7 +76,7 @@ func (x FunctionDef) Pos() source.Position    { return x.Position }
 func (x FunctionDef) EndPos() source.Position { return x.End }
 func (x FunctionDef) Name() string            { return x.FuncName }
 
-func (x FunctionDef) String() string {
+func (x FunctionDef) Dump() string {
 	s := x.FuncName + "("
 	if x.Public {
 		s = "pub " + s
@@ -90,7 +90,7 @@ func (x FunctionDef) String() string {
 				if delim {
 					s += ", "
 				}
-				s += node.String()
+				s += node.Dump()
 				delim = true
 			},
 		)
@@ -100,7 +100,7 @@ func (x FunctionDef) String() string {
 	case 0:
 		s += ") "
 	case 1:
-		s += ") " + x.Results[0].String() + " "
+		s += ") " + x.Results[0].Dump() + " "
 	default:
 		s += ") ("
 		delim := false
@@ -111,7 +111,7 @@ func (x FunctionDef) String() string {
 					if delim {
 						s += ", "
 					}
-					s += node.String()
+					s += node.Dump()
 					delim = true
 				},
 			)
@@ -119,7 +119,7 @@ func (x FunctionDef) String() string {
 		s += ") "
 	}
 
-	return s + Block{x.Position, x.Body, x.End}.String()
+	return "FunctionDef{" + s + Block{x.Position, x.Body, x.End}.Dump() + "}"
 }
 
 type Field struct {
@@ -135,13 +135,13 @@ func (Field) fieldListChild()           {}
 func (x Field) Pos() source.Position    { return x.Position }
 func (x Field) EndPos() source.Position { return x.End }
 func (x Field) Name() string            { return x.FieldName }
-func (x Field) String() string          { return strings.Join(x.row(), " ") }
+func (x Field) Dump() string            { return "Field{" + strings.Join(x.dumpRow(), " ") + "}" }
 
-func (x Field) row() []string {
+func (x Field) dumpRow() []string {
 	if x.Access == field.AccessHidden {
-		return []string{x.FieldName, x.Type.String()}
+		return []string{x.FieldName, x.Type.Dump()}
 	}
-	return []string{x.FieldName, x.Type.String(), x.Access.String()}
+	return []string{x.FieldName, x.Type.Dump(), x.Access.String()}
 }
 
 type Import struct {
@@ -158,7 +158,7 @@ func (Import) fileChild()                {}
 func (Import) importListChild()          {}
 func (x Import) Pos() source.Position    { return x.Position }
 func (x Import) EndPos() source.Position { return x.End }
-func (x Import) String() string          { return "import " + x.stringInList() }
+func (x Import) Dump() string            { return "Import{" + x.stringInList() + "}" }
 
 func (x Import) stringInList() string {
 	s := x.Path
@@ -191,8 +191,8 @@ func (Imports) fileChild()                {}
 func (x Imports) Pos() source.Position    { return x.Position }
 func (x Imports) EndPos() source.Position { return x.End }
 
-func (x Imports) String() string {
-	s := "imports {"
+func (x Imports) Dump() string {
+	s := "Imports{"
 
 	delim := false
 	for _, node := range x.Imports {
@@ -222,9 +222,9 @@ func (Parameter) Node() string              { return "parameter" }
 func (Parameter) paramListChild()           {}
 func (x Parameter) Pos() source.Position    { return x.Position }
 func (x Parameter) EndPos() source.Position { return x.End }
-func (x Parameter) String() string          { return strings.Join(x.row(), " ") }
+func (x Parameter) Dump() string            { return "Parameter{" + strings.Join(x.dumpRow(), " ") + "}" }
+func (x Parameter) dumpRow() []string       { return []string{x.ParamName, x.Type.Dump()} }
 func (x Parameter) Name() string            { return x.ParamName }
-func (x Parameter) row() []string           { return []string{x.ParamName, x.Type.String()} }
 
 type TypeDef struct {
 	source.Position
@@ -240,7 +240,7 @@ func (x TypeDef) Pos() source.Position    { return x.Position }
 func (x TypeDef) EndPos() source.Position { return x.End }
 func (x TypeDef) Name() string            { return x.TypeName }
 
-func (x TypeDef) String() string {
+func (x TypeDef) Dump() string {
 	s := x.TypeName + " {"
 	if x.Public {
 		s = "pub " + s
@@ -254,12 +254,12 @@ func (x TypeDef) String() string {
 				if delim {
 					s += "; "
 				}
-				s += node.String()
+				s += node.Dump()
 				delim = true
 			},
 			func(Import) {},
 		)
 	}
 
-	return s + "}"
+	return "TypeDef{" + s + "}}"
 }

@@ -25,4 +25,4 @@ func (Identifier) Node() string              { return "identifier" }
 func (Identifier) identListChild()           {}
 func (x Identifier) Pos() source.Position    { return x.Position }
 func (x Identifier) EndPos() source.Position { return x.End }
-func (x Identifier) String() string          { return x.Name.String() }
+func (x Identifier) Dump() string            { return "Identifier{" + x.Name.String() + "}" }
