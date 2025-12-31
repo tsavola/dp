@@ -130,6 +130,9 @@ func parseVariableDecl(s scan) (scan, ast.BlockChild) {
 		parseCommaString,
 		parseVariableName,
 	)
+	if len(names) == 0 {
+		pan.Panic(newError(pos, "variable declaration: empty list"))
+	}
 
 	s.take(token.Colon, "variable declaration: colon expected")
 
@@ -149,6 +152,9 @@ func parseVariableDef(s scan) (scan, ast.BlockChild) {
 		parseCommaString,
 		parseVariableName,
 	)
+	if len(names) == 0 {
+		pan.Panic(newError(pos, "variable definition: empty list"))
+	}
 
 	s.take(token.Define, "variable definition: operator expected")
 
