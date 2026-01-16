@@ -49,7 +49,7 @@ func formatStatements(
 ) {
 	prevLine := startLine
 
-	for _, node := range nodes {
+	for i, node := range nodes {
 		indentNode(w, level, prevLine, node)
 
 		ast.VisitBlockChild(node,
@@ -73,7 +73,7 @@ func formatStatements(
 			},
 
 			func(node ast.Comment) {
-				formatComment(w, level, node, commentOffsets)
+				formatComment(w, level, node, i, commentOffsets)
 			},
 
 			func(node ast.Continue) {

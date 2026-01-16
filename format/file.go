@@ -229,12 +229,12 @@ func formatFunctionParams(w writer, def ast.FunctionDef) {
 func formatFunctionParamsMultiLine(w writer, def ast.FunctionDef, columnify func(ast.ParamListChild) []string, columnWidths map[int][]*int, commentOffsets map[int]*int) {
 	prevLine := def.Line
 
-	for _, node := range def.Params {
+	for i, node := range def.Params {
 		indentNode(w, 1, prevLine, node)
 
 		ast.VisitParamListChild(node,
 			func(node ast.Comment) {
-				formatComment(w, 1, node, commentOffsets)
+				formatComment(w, 1, node, i, commentOffsets)
 			},
 
 			func(node ast.Parameter) {
@@ -296,12 +296,12 @@ func formatFunctionResults(w writer, def ast.FunctionDef) {
 func formatFunctionResultsMultiLine(w writer, def ast.FunctionDef, commentOffsets map[int]*int) {
 	prevLine := def.ParamsEnd.Line
 
-	for _, node := range def.Results {
+	for i, node := range def.Results {
 		indentNode(w, 1, prevLine, node)
 
 		ast.VisitTypeListChild(node,
 			func(node ast.Comment) {
-				formatComment(w, 1, node, commentOffsets)
+				formatComment(w, 1, node, i, commentOffsets)
 			},
 
 			func(node ast.TypeSpec) {
@@ -381,11 +381,11 @@ func formatTypeDefBody(w writer, node ast.TypeDef, empty bool) {
 func formatTypeFields(w writer, def ast.TypeDef, columnify func(ast.FieldListChild) []string, columnWidths map[int][]*int, commentOffsets map[int]*int) {
 	prevLine := def.Line
 
-	for _, node := range def.Fields {
+	for i, node := range def.Fields {
 		indentNode(w, 1, prevLine, node)
 
 		ast.VisitFieldListChild(node,
-			func(node ast.Comment) { formatComment(w, 1, node, commentOffsets) },
+			func(node ast.Comment) { formatComment(w, 1, node, i, commentOffsets) },
 			func(node ast.Field) { formatColumns(w, columnify(node), columnWidths[node.Line]) },
 			func(ast.Import) {},
 		)

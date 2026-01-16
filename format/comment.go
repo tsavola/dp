@@ -101,13 +101,13 @@ func splitCommentedNodes[T ast.Node, R ast.Node](nodes []T, splitOnGap bool) []c
 }
 
 // formatComment grows offsets if necessary.
-func formatComment(w writer, level int, node ast.Comment, offsets map[int]*int) {
+func formatComment(w writer, level int, node ast.Comment, nodeIndex int, offsets map[int]*int) {
 	lineLen := w.currentLineLen()
 
-	if off := offsets[node.Line]; off != nil {
+	if off := offsets[nodeIndex]; off != nil {
 		pad(w, *off-lineLen)
 	} else {
-		off = offsets[node.Line-1]
+		off = offsets[nodeIndex-1]
 
 		switch {
 		case off == nil: // Previous line has no comment.
@@ -120,7 +120,7 @@ func formatComment(w writer, level int, node ast.Comment, offsets map[int]*int) 
 			*off = lineLen
 		}
 
-		offsets[node.Line] = off
+		offsets[nodeIndex] = off
 	}
 
 	formatCommentAlone(w, node)

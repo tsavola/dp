@@ -61,7 +61,7 @@ func formatExprListMultiLine(w writer, level, startLine int, nodes []ast.ExprLis
 	first := true
 	prevLine := startLine
 
-	for _, node := range nodes {
+	for i, node := range nodes {
 		indentNode(w, level, prevLine, node)
 
 		ast.VisitExprListChild(node,
@@ -74,7 +74,7 @@ func formatExprListMultiLine(w writer, level, startLine int, nodes []ast.ExprLis
 				if first {
 					formatCommentAlone(w, node)
 				} else {
-					formatComment(w, 1, node, commentOffsets)
+					formatComment(w, 1, node, i, commentOffsets)
 				}
 			},
 
