@@ -47,6 +47,7 @@ func (ConstantDef) fileChild()                {}
 func (x ConstantDef) Pos() source.Position    { return x.Position }
 func (x ConstantDef) EndPos() source.Position { return x.End }
 func (x ConstantDef) Name() string            { return x.ConstName }
+func (x ConstantDef) IsPublic() bool          { return x.Public }
 
 func (x ConstantDef) Dump() string {
 	s := x.ConstName + " = " + x.Value.Dump()
@@ -75,6 +76,7 @@ func (FunctionDef) fileChild()                {}
 func (x FunctionDef) Pos() source.Position    { return x.Position }
 func (x FunctionDef) EndPos() source.Position { return x.End }
 func (x FunctionDef) Name() string            { return x.FuncName }
+func (x FunctionDef) IsPublic() bool          { return x.Public }
 
 func (x FunctionDef) Dump() string {
 	s := x.FuncName + "("
@@ -239,6 +241,7 @@ func (TypeDef) fileChild()                {}
 func (x TypeDef) Pos() source.Position    { return x.Position }
 func (x TypeDef) EndPos() source.Position { return x.End }
 func (x TypeDef) Name() string            { return x.TypeName }
+func (x TypeDef) IsPublic() bool          { return x.Public }
 
 func (x TypeDef) Dump() string {
 	s := x.TypeName + " {"
