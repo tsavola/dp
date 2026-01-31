@@ -12,15 +12,22 @@ import (
 func formatBlock(w writer, level, startLine int, nodes []ast.BlockChild) {
 	w.WriteString("{")
 
-	columnify := func(node ast.BlockChild) []string {
-		switch node := node.(type) {
-		case ast.VariableDecl:
-			return []string{strings.Join(node.Names, ", "), ":"}
-		case ast.VariableDef:
-			return []string{strings.Join(node.Names, ", "), ":="}
-		default:
-			return nil
-		}
+	columnify := func(node ast.BlockChild) (values []string) {
+		ast.VisitBlockChild(node,
+			func(ast.Assign) {},
+			func(ast.Block) {},
+			func(ast.Break) {},
+			func(ast.Comment) {},
+			func(ast.Continue) {},
+			func(ast.Expression) {},
+			func(ast.For) {},
+			func(ast.If) {},
+			func(ast.Import) {},
+			func(ast.Return) {},
+			func(node ast.VariableDecl) { values = []string{strings.Join(node.Names, ", "), ":"} },
+			func(node ast.VariableDef) { values = []string{strings.Join(node.Names, ", "), ":="} },
+		)
+		return
 	}
 
 	var (

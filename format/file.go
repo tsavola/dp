@@ -26,14 +26,14 @@ func File(nodes []ast.FileChild) []byte {
 	for i, g := range groups {
 		if i != importsIndex && g.node != nil {
 			var isImport bool
-
-			switch (*g.node).(type) {
-			case ast.Import:
-				isImport = true
-			case ast.Imports:
-				isImport = true
-			}
-
+			ast.VisitFileChild(*g.node,
+				func(ast.Comment) {},
+				func(ast.ConstantDef) {},
+				func(ast.FunctionDef) {},
+				func(ast.Import) { isImport = true },
+				func(ast.Imports) { isImport = true },
+				func(ast.TypeDef) {},
+			)
 			if isImport {
 				continue
 			}
@@ -46,13 +46,27 @@ func File(nodes []ast.FileChild) []byte {
 			prev := groups[i-1].node
 			curr := g.node
 			if curr != nil && prev != nil {
-				if prev, ok := (*prev).(ast.ConstantDef); ok {
-					if curr, ok := (*curr).(ast.ConstantDef); ok {
-						if curr.Line-prev.End.Line <= 1 && curr.Public == prev.Public {
-							gap = false
-						}
-					}
-				}
+				ast.VisitFileChild(*prev,
+					func(ast.Comment) {},
+					func(prev ast.ConstantDef) {
+						ast.VisitFileChild(*curr,
+							func(ast.Comment) {},
+							func(curr ast.ConstantDef) {
+								if curr.Line-prev.End.Line <= 1 && curr.Public == prev.Public {
+									gap = false
+								}
+							},
+							func(ast.FunctionDef) {},
+							func(ast.Import) {},
+							func(ast.Imports) {},
+							func(ast.TypeDef) {},
+						)
+					},
+					func(ast.FunctionDef) {},
+					func(ast.Import) {},
+					func(ast.Imports) {},
+					func(ast.TypeDef) {},
+				)
 			}
 
 			if gap {
@@ -203,11 +217,12 @@ func formatFunctionParams(w writer, def ast.FunctionDef) {
 			}
 		}
 	} else {
-		columnify := func(node ast.ParamListChild) []string {
-			if node, ok := node.(ast.Parameter); ok {
-				return []string{node.ParamName, node.Type.Type.String()}
-			}
-			return nil
+		columnify := func(node ast.ParamListChild) (values []string) {
+			ast.VisitParamListChild(node,
+				func(ast.Comment) {},
+				func(node ast.Parameter) { values = []string{node.ParamName, node.Type.Type.String()} },
+			)
+			return
 		}
 
 		var (
@@ -323,18 +338,32 @@ func trimFunctionBody(def ast.FunctionDef) []ast.BlockChild {
 	nodes := append([]ast.BlockChild{}, def.Body...)
 
 	for i := len(nodes) - 1; i >= 0; i-- {
-		switch node := nodes[i].(type) {
-		case ast.Comment:
+		done := true
 
-		case ast.Return:
-			if len(node.Values) > 0 {
-				return nodes
-			}
+		ast.VisitBlockChild(nodes[i],
+			func(ast.Assign) {},
+			func(ast.Block) {},
+			func(ast.Break) {},
+			func(node ast.Comment) {
+				done = false
+			},
+			func(ast.Continue) {},
+			func(ast.Expression) {},
+			func(ast.For) {},
+			func(ast.If) {},
+			func(ast.Import) {},
+			func(node ast.Return) {
+				if len(node.Values) == 0 {
+					nodes = append(nodes[:i], nodes[i+1:]...)
+					done = false
+				}
+			},
+			func(ast.VariableDecl) {},
+			func(ast.VariableDef) {},
+		)
 
-			nodes = append(nodes[:i], nodes[i+1:]...)
-
-		default:
-			return nodes
+		if done {
+			break
 		}
 	}
 
@@ -349,17 +378,20 @@ func formatTypeDefBody(w writer, node ast.TypeDef, empty bool) {
 	w.WriteString(" {")
 
 	if !empty {
-		columnify := func(node ast.FieldListChild) []string {
-			if node, ok := node.(ast.Field); ok {
-				values := make([]string, 0, 3)
-				values = append(values, node.FieldName)
-				values = append(values, node.Type.Type.String())
-				if node.Access != field.AccessHidden {
-					values = append(values, node.Access.String())
-				}
-				return values
-			}
-			return nil
+		columnify := func(node ast.FieldListChild) (values []string) {
+			ast.VisitFieldListChild(node,
+				func(ast.Comment) {},
+				func(node ast.Field) {
+					values = make([]string, 0, 3)
+					values = append(values, node.FieldName)
+					values = append(values, node.Type.Type.String())
+					if node.Access != field.AccessHidden {
+						values = append(values, node.Access.String())
+					}
+				},
+				func(ast.Import) {},
+			)
+			return
 		}
 
 		var (
