@@ -321,8 +321,8 @@ func importPathGroup(path string) int {
 		return 3
 	}
 
-	if i := strings.Index(path, "."); i >= 0 {
-		if !strings.Contains(path[:i], "/") {
+	if before, _, ok := strings.Cut(path, "."); ok {
+		if !strings.Contains(before, "/") {
 			return 2
 		}
 	}
