@@ -5,6 +5,7 @@ package position
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/tsavola/dp/source"
 )
@@ -51,24 +52,24 @@ func (e posError) PositionError() string { return e.IndentError("") }
 func (e posError) Unwrap() []error       { return e.errs }
 
 func (e posError) IndentError(indent string) string {
-	var s string
+	var s strings.Builder
 	if e.pos.Path != "" {
-		s += e.pos.Path + ":"
+		s.WriteString(e.pos.Path + ":")
 	}
 	if e.pos.Line > 0 {
-		s += fmt.Sprintf("%04d:%03d: ", e.pos.Line, e.pos.Column)
+		s.WriteString(fmt.Sprintf("%04d:%03d: ", e.pos.Line, e.pos.Column))
 	}
-	s += indent + e.msg
+	s.WriteString(indent + e.msg)
 
 	if len(e.errs) > 0 {
-		s += ":"
+		s.WriteString(":")
 		indent = "  " + indent
 		for _, e := range e.errs {
-			s += "\n" + indentError(indent, e)
+			s.WriteString("\n" + indentError(indent, e))
 		}
 	}
 
-	return s
+	return s.String()
 }
 
 type errorIndenter interface {
