@@ -34,8 +34,7 @@ func parse[ScanState poser, Result any](s ScanState, parsers ...func(ScanState) 
 	}
 
 	if len(errs) == 1 {
-		var e position.Error
-		if errors.As(errs[0], &e) {
+		if _, ok := errors.AsType[position.Error](errs[0]); ok {
 			pan.Panic(errs[0])
 		}
 	}
