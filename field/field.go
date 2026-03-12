@@ -16,13 +16,13 @@ const (
 func (a Access) String() string {
 	switch a {
 	case AccessHidden:
-		return "hidden"
+		return "Hidden"
 	case AccessVisible:
-		return "visible"
+		return "Visible"
 	case AccessMutable:
-		return "mutable"
+		return "Mutable"
 	case AccessAssignable:
-		return "assignable"
+		return "Assignable"
 	default:
 		return "<invalid access mode>"
 	}

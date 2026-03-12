@@ -17,7 +17,7 @@ func File(nodes []ast.FileChild) []byte {
 		return nil
 	}
 
-	size := nodes[len(nodes)-1].EndPos().ByteOffset
+	size := nodes[len(nodes)-1].End().ByteOffset
 	w := writer{bytes.NewBuffer(make([]byte, 0, size+size/4))}
 
 	groups := splitCommentedNodes[ast.FileChild, ast.FileChild](nodes, true)
@@ -52,7 +52,7 @@ func File(nodes []ast.FileChild) []byte {
 						ast.VisitFileChild(*curr,
 							func(ast.Comment) {},
 							func(curr ast.ConstantDef) {
-								if curr.Line-prev.End.Line <= 1 && curr.Public == prev.Public {
+								if curr.At.Line-prev.EndAt.Line <= 1 && curr.Public == prev.Public {
 									gap = false
 								}
 							},
@@ -164,7 +164,7 @@ func File(nodes []ast.FileChild) []byte {
 					if body := trimFunctionBody(node); len(body) == 0 {
 						w.WriteString("{}")
 					} else {
-						formatBlock(w, 1, node.BodyPos.Line, body)
+						formatBlock(w, 1, node.BodyAt.Line, body)
 					}
 					w.WriteString("\n")
 				},
@@ -205,7 +205,7 @@ func formatFunctionParams(w writer, def ast.FunctionDef) {
 
 	w.WriteString("(")
 
-	if !comments && (len(params) == 0 || params[0].Line == def.Line) {
+	if !comments && (len(params) == 0 || params[0].At.Line == def.At.Line) {
 		for i, param := range params {
 			if i > 0 {
 				w.WriteString(", ")
@@ -242,7 +242,7 @@ func formatFunctionParams(w writer, def ast.FunctionDef) {
 }
 
 func formatFunctionParamsMultiLine(w writer, def ast.FunctionDef, columnify func(ast.ParamListChild) []string, columnWidths map[int][]*int, commentOffsets map[int]*int) {
-	prevLine := def.Line
+	prevLine := def.At.Line
 
 	for i, node := range def.Params {
 		indentNode(w, 1, prevLine, node)
@@ -253,12 +253,12 @@ func formatFunctionParamsMultiLine(w writer, def ast.FunctionDef, columnify func
 			},
 
 			func(node ast.Parameter) {
-				formatColumns(w, columnify(node), columnWidths[node.Line])
+				formatColumns(w, columnify(node), columnWidths[node.At.Line])
 				w.WriteString(",")
 			},
 		)
 
-		prevLine = node.EndPos().Line
+		prevLine = node.End().Line
 	}
 }
 
@@ -282,7 +282,7 @@ func formatFunctionResults(w writer, def ast.FunctionDef) {
 		w.WriteString(specs[0].Type.String())
 		w.WriteString(" ")
 
-	case !comments && specs[0].Line == def.ParamsEnd.Line:
+	case !comments && specs[0].At.Line == def.ParamsEndAt.Line:
 		w.WriteString("(")
 
 		for i, spec := range specs {
@@ -309,7 +309,7 @@ func formatFunctionResults(w writer, def ast.FunctionDef) {
 }
 
 func formatFunctionResultsMultiLine(w writer, def ast.FunctionDef, commentOffsets map[int]*int) {
-	prevLine := def.ParamsEnd.Line
+	prevLine := def.ParamsEndAt.Line
 
 	for i, node := range def.Results {
 		indentNode(w, 1, prevLine, node)
@@ -325,7 +325,7 @@ func formatFunctionResultsMultiLine(w writer, def ast.FunctionDef, commentOffset
 			},
 		)
 
-		prevLine = node.EndPos().Line
+		prevLine = node.End().Line
 	}
 }
 
@@ -411,17 +411,17 @@ func formatTypeDefBody(w writer, node ast.TypeDef, empty bool) {
 }
 
 func formatTypeFields(w writer, def ast.TypeDef, columnify func(ast.FieldListChild) []string, columnWidths map[int][]*int, commentOffsets map[int]*int) {
-	prevLine := def.Line
+	prevLine := def.At.Line
 
 	for i, node := range def.Fields {
 		indentNode(w, 1, prevLine, node)
 
 		ast.VisitFieldListChild(node,
 			func(node ast.Comment) { formatComment(w, 1, node, i, commentOffsets) },
-			func(node ast.Field) { formatColumns(w, columnify(node), columnWidths[node.Line]) },
+			func(node ast.Field) { formatColumns(w, columnify(node), columnWidths[node.At.Line]) },
 			func(ast.Import) {},
 		)
 
-		prevLine = node.EndPos().Line
+		prevLine = node.End().Line
 	}
 }

@@ -16,13 +16,13 @@ func (name QualifiedName) Short() string     { return name[len(name)-1] }
 func (name QualifiedName) String() string    { return strings.Join(name, "::") }
 
 type Identifier struct {
-	source.Position
-	Name QualifiedName
-	End  source.Position
+	At    source.Position
+	Name  QualifiedName
+	EndAt source.Position
 }
 
-func (Identifier) Node() string              { return "identifier" }
-func (Identifier) identListChild()           {}
-func (x Identifier) Pos() source.Position    { return x.Position }
-func (x Identifier) EndPos() source.Position { return x.End }
-func (x Identifier) Dump() string            { return "Identifier{" + x.Name.String() + "}" }
+func (Identifier) Node() string           { return "Identifier" }
+func (Identifier) identListChild()        {}
+func (x Identifier) Pos() source.Position { return x.At }
+func (x Identifier) End() source.Position { return x.EndAt }
+func (x Identifier) Dump() string         { return "Identifier{" + x.Name.String() + "}" }

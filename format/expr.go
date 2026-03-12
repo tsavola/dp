@@ -44,11 +44,7 @@ func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight b
 		},
 
 		func(node ast.Boolean) {
-			if node.Value {
-				w.WriteString("true")
-			} else {
-				w.WriteString("false")
-			}
+			w.WriteString(node.Source)
 		},
 
 		func(node ast.Call) {

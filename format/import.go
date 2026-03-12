@@ -189,9 +189,9 @@ func resolveImports(groups []commentedNode[ast.Import]) []commentedNode[ast.Impo
 					func(node ast.Identifier) {
 						if path := namespacePaths[node.Name.Namespace()]; path != nil {
 							pathNames[*path] = append(pathNames[*path], ast.Identifier{
-								node.Position,
+								node.At,
 								ast.QualifiedName{node.Name.Short()},
-								node.End,
+								node.EndAt,
 							})
 						} else {
 							badNames = append(badNames, node)
@@ -203,10 +203,10 @@ func resolveImports(groups []commentedNode[ast.Import]) []commentedNode[ast.Impo
 			for path, names := range pathNames {
 				resolved = append(resolved, commentedNode[ast.Import]{
 					node: &ast.Import{
-						g.node.Position,
+						g.node.At,
 						path,
 						names,
-						g.node.End,
+						g.node.EndAt,
 					},
 				})
 			}

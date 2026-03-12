@@ -85,7 +85,7 @@ func parseIf(s scan) (scan, ast.BlockChild) {
 	keyword := s.take(token.If, "if keyword expected")
 	s, test := parseAnyExpr(s, false)
 
-	thenPos := s.take(token.BraceLeft, "if: opening brace expected").Pos()
+	thenAt := s.take(token.BraceLeft, "if: opening brace expected").Pos()
 	s, then := parseStatements(s)
 	thenEnd := s.last
 
@@ -95,7 +95,7 @@ func parseIf(s scan) (scan, ast.BlockChild) {
 		s, els = parseStatements(s)
 	}
 
-	return s, ast.If{keyword.Pos(), test, thenPos, then, thenEnd, els, s.last}
+	return s, ast.If{keyword.Pos(), test, thenAt, then, thenEnd, els, s.last}
 }
 
 func parseReturn(s scan) (scan, ast.BlockChild) {

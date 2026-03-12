@@ -51,31 +51,31 @@ func reviseBlock(olds []old.BlockChild) (news []new.BlockChild) {
 		old.VisitBlockChild(node,
 			func(node old.Assign) {
 				news = append(news, new.Assign{
-					node.Position,
+					node.At,
 					reviseAssignList(node.Objects),
 					reviseExprList(node.Subjects),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.Block) {
 				news = append(news, new.Block{
-					node.Position,
+					node.At,
 					reviseBlock(node.Body),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.Break) {
-				news = append(news, new.Break{node.Position, node.End})
+				news = append(news, new.Break{node.At, node.EndAt})
 			},
 
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.Continue) {
-				news = append(news, new.Continue{node.Position, node.End})
+				news = append(news, new.Continue{node.At, node.EndAt})
 			},
 
 			func(node old.Expression) {
@@ -84,23 +84,23 @@ func reviseBlock(olds []old.BlockChild) (news []new.BlockChild) {
 
 			func(node old.For) {
 				news = append(news, new.For{
-					node.Position,
+					node.At,
 					reviseExpr(node.Test),
-					node.BodyPos,
+					node.BodyAt,
 					reviseBlock(node.Body),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.If) {
 				news = append(news, new.If{
-					node.Position,
+					node.At,
 					reviseExpr(node.Test),
-					node.ThenPos,
+					node.ThenAt,
 					reviseBlock(node.Then),
-					node.ThenEnd,
+					node.ThenEndAt,
 					reviseBlock(node.Else),
-					node.End,
+					node.EndAt,
 				})
 			},
 
@@ -110,27 +110,27 @@ func reviseBlock(olds []old.BlockChild) (news []new.BlockChild) {
 
 			func(node old.Return) {
 				news = append(news, new.Return{
-					node.Position,
+					node.At,
 					reviseExprList(node.Values),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.VariableDecl) {
 				news = append(news, new.VariableDecl{
-					node.Position,
+					node.At,
 					node.Names,
 					reviseTypeSpecPtr(node.Type),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.VariableDef) {
 				news = append(news, new.VariableDef{
-					node.Position,
+					node.At,
 					node.Names,
 					reviseExprList(node.Values),
-					node.End,
+					node.EndAt,
 				})
 			},
 		)
@@ -142,9 +142,9 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 	old.VisitExpr(node,
 		func(node old.Address) {
 			result = new.Address{
-				node.Position,
+				node.At,
 				reviseExpr(node.Expr),
-				node.End,
+				node.EndAt,
 			}
 		},
 
@@ -153,12 +153,12 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 				reviseExpr(node.Left),
 				new.BinaryOp(node.Op),
 				reviseExpr(node.Right),
-				node.End,
+				node.EndAt,
 			}
 		},
 
 		func(node old.Boolean) {
-			result = new.Boolean{node.Position, node.Value, node.End}
+			result = new.Boolean{node.At, node.Source}
 		},
 
 		func(node old.Call) {
@@ -166,14 +166,14 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 		},
 
 		func(node old.Character) {
-			result = new.Character{node.Position, node.Source, node.End}
+			result = new.Character{node.At, node.Source}
 		},
 
 		func(node old.Clone) {
 			result = new.Clone{
-				node.Position,
+				node.At,
 				reviseExpr(node.Expr),
-				node.End,
+				node.EndAt,
 			}
 		},
 
@@ -182,18 +182,18 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 		},
 
 		func(node old.Integer) {
-			result = new.Integer{node.Position, node.Source, node.End}
+			result = new.Integer{node.At, node.Source}
 		},
 
 		func(node old.Nil) {
-			result = new.Nil{node.Position, node.End}
+			result = new.Nil{node.At, node.EndAt}
 		},
 
 		func(node old.PointerDereference) {
 			result = new.PointerDereference{
-				node.Position,
+				node.At,
 				reviseExpr(node.Expr),
-				node.End,
+				node.EndAt,
 			}
 		},
 
@@ -202,20 +202,20 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 		},
 
 		func(node old.String) {
-			result = new.String{node.Position, node.Source, node.End}
+			result = new.String{node.At, node.Source}
 		},
 
 		func(node old.Unary) {
 			result = new.Unary{
-				node.Position,
+				node.At,
 				new.UnaryOp(node.Op),
 				reviseExpr(node.Expr),
-				node.End,
+				node.EndAt,
 			}
 		},
 
 		func(node old.Zero) {
-			result = new.Zero{node.Position, node.End}
+			result = new.Zero{node.At, node.EndAt}
 		},
 	)
 	return
@@ -229,7 +229,7 @@ func reviseExprList(olds []old.ExprListChild) (news []new.ExprListChild) {
 			},
 
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.Expression) {
@@ -244,7 +244,7 @@ func reviseFieldList(olds []old.FieldListChild) (news []new.FieldListChild) {
 	for _, node := range olds {
 		old.VisitFieldListChild(node,
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.Field) {
@@ -263,32 +263,32 @@ func reviseFile(olds []old.FileChild) (news []new.FileChild) {
 	for _, node := range olds {
 		old.VisitFileChild(node,
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.ConstantDef) {
 				news = append(news, new.ConstantDef{
-					node.Position,
+					node.At,
 					node.Public,
 					node.ConstName,
 					reviseExpr(node.Value),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.FunctionDef) {
 				news = append(news, new.FunctionDef{
-					node.Position,
+					node.At,
 					node.Public,
 					node.ReceiverName,
 					reviseTypeSpecPtr(node.ReceiverType),
 					node.FuncName,
 					reviseParamList(node.Params),
-					node.ParamsEnd,
+					node.ParamsEndAt,
 					reviseTypeList(node.Results),
-					node.BodyPos,
+					node.BodyAt,
 					reviseBlock(node.Body),
-					node.End,
+					node.EndAt,
 				})
 			},
 
@@ -298,19 +298,19 @@ func reviseFile(olds []old.FileChild) (news []new.FileChild) {
 
 			func(node old.Imports) {
 				news = append(news, new.Imports{
-					node.Position,
+					node.At,
 					reviseImportList(node.Imports),
-					node.End,
+					node.EndAt,
 				})
 			},
 
 			func(node old.TypeDef) {
 				news = append(news, new.TypeDef{
-					node.Position,
+					node.At,
 					node.Public,
 					node.TypeName,
 					reviseFieldList(node.Fields),
-					node.End,
+					node.EndAt,
 				})
 			},
 		)
@@ -322,14 +322,14 @@ func reviseIdentList(olds []old.IdentListChild) (news []new.IdentListChild) {
 	for _, node := range olds {
 		old.VisitIdentListChild(node,
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.Identifier) {
 				news = append(news, new.Identifier{
-					node.Position,
+					node.At,
 					new.QualifiedName(node.Name),
-					node.End,
+					node.EndAt,
 				})
 			},
 		)
@@ -341,7 +341,7 @@ func reviseImportList(olds []old.ImportListChild) (news []new.ImportListChild) {
 	for _, node := range olds {
 		old.VisitImportListChild(node,
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.Import) {
@@ -356,15 +356,15 @@ func reviseParamList(olds []old.ParamListChild) (news []new.ParamListChild) {
 	for _, node := range olds {
 		old.VisitParamListChild(node,
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.Parameter) {
 				news = append(news, new.Parameter{
-					node.Position,
+					node.At,
 					node.ParamName,
 					reviseTypeSpec(node.Type),
-					node.End,
+					node.EndAt,
 				})
 			},
 		)
@@ -376,7 +376,7 @@ func reviseTypeList(olds []old.TypeListChild) (news []new.TypeListChild) {
 	for _, node := range olds {
 		old.VisitTypeListChild(node,
 			func(node old.Comment) {
-				news = append(news, new.Comment{node.Position, node.Source})
+				news = append(news, new.Comment{node.At, node.Source})
 			},
 
 			func(node old.TypeSpec) {
@@ -389,28 +389,28 @@ func reviseTypeList(olds []old.TypeListChild) (news []new.TypeListChild) {
 
 func reviseField(node old.Field) new.Field {
 	return new.Field{
-		node.Position,
+		node.At,
 		node.FieldName,
 		reviseTypeSpec(node.Type),
 		newfield.Access(node.Access),
-		node.End,
+		node.EndAt,
 	}
 }
 
 func reviseImport(node old.Import) new.Import {
 	return new.Import{
-		node.Position,
+		node.At,
 		node.Path,
 		reviseIdentList(node.Names),
-		node.End,
+		node.EndAt,
 	}
 }
 
 func reviseAssignerDereference(node old.AssignerDereference) new.AssignerDereference {
 	return new.AssignerDereference{
-		node.Position,
+		node.At,
 		node.Name,
-		node.End,
+		node.EndAt,
 	}
 }
 
@@ -418,7 +418,7 @@ func reviseCall(node old.Call) new.Call {
 	return new.Call{
 		reviseSelector(node.Name),
 		reviseExprList(node.Args),
-		node.End,
+		node.EndAt,
 	}
 }
 
@@ -426,15 +426,15 @@ func reviseIndex(node old.Index) new.Index {
 	return new.Index{
 		reviseSelector(node.Name),
 		reviseExpr(node.Index),
-		node.End,
+		node.EndAt,
 	}
 }
 
 func reviseSelector(node old.Selector) new.Selector {
 	return new.Selector{
-		node.Position,
+		node.At,
 		node.Name,
-		node.End,
+		node.EndAt,
 	}
 }
 
@@ -461,9 +461,9 @@ func reviseTypePtr(p *old.Type) *new.Type {
 
 func reviseTypeSpec(node old.TypeSpec) new.TypeSpec {
 	return new.TypeSpec{
-		node.Position,
+		node.At,
 		reviseType(node.Type),
-		node.End,
+		node.EndAt,
 	}
 }
 

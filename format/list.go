@@ -9,7 +9,7 @@ import (
 
 func useMultipleLines[T ast.Node](startLine int, nodes ...T) bool {
 	for _, node := range nodes {
-		if node.EndPos().Line > startLine || ast.IsComment(node) {
+		if node.End().Line > startLine || ast.IsComment(node) {
 			return true
 		}
 	}
@@ -85,6 +85,6 @@ func formatExprListMultiLine(w writer, level, startLine int, nodes []ast.ExprLis
 		)
 
 		first = false
-		prevLine = node.EndPos().Line
+		prevLine = node.End().Line
 	}
 }

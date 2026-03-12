@@ -11,7 +11,7 @@ import (
 type Node interface {
 	Node() string
 	Pos() source.Position
-	EndPos() source.Position
+	End() source.Position
 	Dump() string
 }
 

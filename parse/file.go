@@ -138,10 +138,10 @@ func parseFunctionDef(s scan) (scan, ast.FileChild) {
 		},
 	)
 
-	bodyPos := s.take(token.BraceLeft, "function definition: opening brace expected").Pos()
+	bodyAt := s.take(token.BraceLeft, "function definition: opening brace expected").Pos()
 	s, body := parseStatements(s)
 
-	return s, ast.FunctionDef{pos, public, rName, rType, name, params, paramsEnd, results, bodyPos, body, s.last}
+	return s, ast.FunctionDef{pos, public, rName, rType, name, params, paramsEnd, results, bodyAt, body, s.last}
 }
 
 func fillInFunctionParamTypes(nodes []ast.ParamListChild) []ast.ParamListChild {
@@ -155,7 +155,7 @@ func fillInFunctionParamTypes(nodes []ast.ParamListChild) []ast.ParamListChild {
 					latest = node.Type
 				} else {
 					if !typeSpecified(latest) {
-						pan.Panic(newError(node.EndPos(), "function parameter type expected"))
+						pan.Panic(newError(node.EndAt, "function parameter type expected"))
 					}
 					node.Type = latest
 					nodes[i] = node

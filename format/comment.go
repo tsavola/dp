@@ -37,7 +37,7 @@ func splitCommentedNodes[T ast.Node, R ast.Node](nodes []T, splitOnGap bool) []c
 		}
 
 		next := nodes[i+1]
-		step := next.Pos().Line - curr.EndPos().Line
+		step := next.Pos().Line - curr.End().Line
 
 		var split bool
 
@@ -67,7 +67,7 @@ func splitCommentedNodes[T ast.Node, R ast.Node](nodes []T, splitOnGap bool) []c
 
 							curr = next
 							next = nodes[i+1]
-							step = next.Pos().Line - curr.EndPos().Line
+							step = next.Pos().Line - curr.End().Line
 
 							if step != 1 {
 								break

@@ -54,13 +54,13 @@ func (t Type) String() string {
 }
 
 type TypeSpec struct {
-	source.Position
+	At source.Position
 	Type
-	End source.Position
+	EndAt source.Position
 }
 
-func (TypeSpec) Node() string              { return "type specification" }
-func (TypeSpec) typeListChild()            {}
-func (x TypeSpec) Pos() source.Position    { return x.Position }
-func (x TypeSpec) EndPos() source.Position { return x.End }
-func (x TypeSpec) Dump() string            { return "TypeSpec{" + x.Type.String() + "}" }
+func (TypeSpec) Node() string           { return "TypeSpec" }
+func (TypeSpec) typeListChild()         {}
+func (x TypeSpec) Pos() source.Position { return x.At }
+func (x TypeSpec) End() source.Position { return x.EndAt }
+func (x TypeSpec) Dump() string         { return "TypeSpec{" + x.Type.String() + "}" }

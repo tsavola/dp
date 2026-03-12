@@ -68,7 +68,7 @@ func formatStatements(
 					formatAssignListChild(w, node)
 				}
 				w.WriteString(" = ")
-				formatExprList(w, level+1, node.Line, node.Subjects, false)
+				formatExprList(w, level+1, node.At.Line, node.Subjects, false)
 			},
 
 			func(node ast.Block) {
@@ -97,17 +97,17 @@ func formatStatements(
 					formatExpr(w, level+1, node.Test, 0, false)
 					w.WriteString(" ")
 				}
-				formatBlock(w, level+1, node.BodyPos.Line, node.Body)
+				formatBlock(w, level+1, node.BodyAt.Line, node.Body)
 			},
 
 			func(node ast.If) {
 				w.WriteString("if ")
 				formatExpr(w, level+1, node.Test, 0, false)
 				w.WriteString(" ")
-				formatBlock(w, level+1, node.ThenPos.Line, node.Then)
+				formatBlock(w, level+1, node.ThenAt.Line, node.Then)
 				if len(node.Else) > 0 {
 					w.WriteString(" else ")
-					formatBlock(w, level+1, node.ThenEnd.Line, node.Else)
+					formatBlock(w, level+1, node.ThenEndAt.Line, node.Else)
 				}
 			},
 
@@ -118,11 +118,11 @@ func formatStatements(
 				if len(node.Values) > 0 {
 					w.WriteString(" ")
 				}
-				formatExprList(w, level+1, node.Line, node.Values, false)
+				formatExprList(w, level+1, node.At.Line, node.Values, false)
 			},
 
 			func(node ast.VariableDecl) {
-				formatColumns(w, columnify(node), columnWidths[node.Line])
+				formatColumns(w, columnify(node), columnWidths[node.At.Line])
 				w.WriteString(" ")
 				if node.Type == nil {
 					w.WriteString("auto")
@@ -132,18 +132,18 @@ func formatStatements(
 			},
 
 			func(node ast.VariableDef) {
-				formatColumns(w, columnify(node), columnWidths[node.Line])
+				formatColumns(w, columnify(node), columnWidths[node.At.Line])
 				w.WriteString(" ")
-				formatExprList(w, level+1, node.Line, node.Values, false)
+				formatExprList(w, level+1, node.At.Line, node.Values, false)
 			},
 		)
 
-		if node.Pos().Line != node.EndPos().Line {
+		if node.Pos().Line != node.End().Line {
 			// Discontinue comment lineage after multi-line statement.
-			commentOffsets[node.EndPos().Line] = new(int)
+			commentOffsets[node.End().Line] = new(int)
 		}
 
-		prevLine = node.EndPos().Line
+		prevLine = node.End().Line
 	}
 }
 

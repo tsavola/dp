@@ -10,18 +10,18 @@ import (
 )
 
 type Token struct {
-	source.Position
+	At source.Position
 	Kind
 	Source string
 }
 
 func (t Token) Pos() source.Position {
-	return t.Position
+	return t.At
 }
 
-// EndPos returns the position immediately after the token.
-func (t Token) EndPos() source.Position {
-	return position.After(t.Position, t.Source)
+// End returns the position immediately after the token.
+func (t Token) End() source.Position {
+	return position.After(t.At, t.Source)
 }
 
 func (t Token) String() string {

@@ -178,7 +178,7 @@ func parseCallInAssignList(s scan) (scan, ast.AssignListChild) {
 
 func parseCharacter(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.Character, "character literal expected")
-	return s, ast.Character{t.Pos(), t.Source, s.last}
+	return s, ast.Character{t.Pos(), t.Source}
 }
 
 func parseClone(s scan) (scan, ast.ExprChild) {
@@ -189,7 +189,7 @@ func parseClone(s scan) (scan, ast.ExprChild) {
 
 func parseFalse(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.False, "literal false expected")
-	return s, ast.Boolean{t.Pos(), false, s.last}
+	return s, ast.Boolean{t.Pos(), t.Source}
 }
 
 func parseIndex(s scan) (scan, ast.Index) {
@@ -205,7 +205,7 @@ func parseIndexInExpr(s scan) (scan, ast.ExprChild)             { return parseIn
 
 func parseInteger(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.Integer, "integer literal expected")
-	return s, ast.Integer{t.Pos(), t.Source, s.last}
+	return s, ast.Integer{t.Pos(), t.Source}
 }
 
 func parseNil(s scan) (scan, ast.ExprChild) {
@@ -263,12 +263,12 @@ func parseSelectorInExpr(s scan) (scan, ast.ExprChild)             { return pars
 
 func parseString(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.String, "string literal expected")
-	return s, ast.String{t.Pos(), t.Source, s.last}
+	return s, ast.String{t.Pos(), t.Source}
 }
 
 func parseTrue(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.True, "literal true expected")
-	return s, ast.Boolean{t.Pos(), true, s.last}
+	return s, ast.Boolean{t.Pos(), t.Source}
 }
 
 func parseUnary(s scan) (scan, ast.ExprChild) {

@@ -58,7 +58,7 @@ func (s *scan) skim(wanted token.Kind) (token.Token, bool) {
 	if len(s.tokens) > 0 {
 		s.last = s.pos()
 	} else {
-		s.last = t.EndPos()
+		s.last = t.End()
 	}
 
 	return t, true
