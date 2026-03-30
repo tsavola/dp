@@ -23,6 +23,10 @@ func Location(path string) Position {
 	}
 }
 
+func (p Position) Pos() Position {
+	return p
+}
+
 func (p Position) String() string {
 	return fmt.Sprintf("%s:%d:%d", p.Path, p.Line, p.Column)
 }
