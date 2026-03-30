@@ -52,8 +52,8 @@ func reviseBlock(olds []old.BlockChild) (news []new.BlockChild) {
 			func(node old.Assign) {
 				news = append(news, new.Assign{
 					node.At,
-					reviseAssignList(node.Objects),
-					reviseExprList(node.Subjects),
+					reviseAssignList(node.Targets),
+					reviseExprList(node.Values),
 					node.EndAt,
 				})
 			},

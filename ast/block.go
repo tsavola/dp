@@ -21,10 +21,10 @@ func (x Expression) End() source.Position { return x.Expr.End() }
 func (x Expression) Dump() string         { return "Expression{" + x.Expr.Dump() + "}" }
 
 type Assign struct {
-	At       source.Position
-	Objects  []AssignListChild
-	Subjects []ExprListChild
-	EndAt    source.Position
+	At      source.Position
+	Targets []AssignListChild
+	Values  []ExprListChild
+	EndAt   source.Position
 }
 
 func (Assign) Node() string           { return "Assignment" }
@@ -36,13 +36,13 @@ func (x Assign) Dump() string {
 	s := "Assign{"
 
 	delim := ""
-	for _, node := range x.Objects {
+	for _, node := range x.Targets {
 		s += delim + node.Dump()
 		delim = ", "
 	}
 
 	delim = " = "
-	for _, node := range x.Subjects {
+	for _, node := range x.Values {
 		if !IsComment(node) {
 			s += delim + node.Dump()
 			delim = ", "

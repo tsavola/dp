@@ -61,14 +61,14 @@ func formatStatements(
 
 		ast.VisitBlockChild(node,
 			func(node ast.Assign) {
-				for i, node := range node.Objects {
+				for i, node := range node.Targets {
 					if i > 0 {
 						w.WriteString(", ")
 					}
 					formatAssignListChild(w, node)
 				}
 				w.WriteString(" = ")
-				formatExprList(w, level+1, node.At.Line, node.Subjects, false)
+				formatExprList(w, level+1, node.At.Line, node.Values, false)
 			},
 
 			func(node ast.Block) {
