@@ -156,6 +156,12 @@ func formatAssignListChild(w writer, node ast.AssignListChild) {
 			w.WriteString(node.Name.String())
 			formatExprList(w, 0, node.Pos().Line, node.Args, true)
 		},
+		func(node ast.Cast) {
+			w.WriteString(node.Name)
+			w.WriteString("(")
+			formatExpr(w, 0, node.Expr, 0, true)
+			w.WriteString(")")
+		},
 		func(node ast.Index) {
 			w.WriteString(node.Name.String())
 			w.WriteString("[")

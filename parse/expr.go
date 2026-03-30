@@ -84,6 +84,7 @@ func parseAtomicExpr(s scan) (scan, ast.ExprChild) {
 	return parse(s,
 		parseAddress,
 		parseCallInExpr,
+		parseCastInExpr,
 		parseCharacter,
 		parseClone,
 		parseEmpty,
@@ -130,7 +131,7 @@ func parseAssignerDereference(s scan) (scan, ast.AssignerDereference, bool) {
 	}
 
 	t := s.peek()
-	if t.Kind != token.Word {
+	if t.Kind != token.WordLower {
 		return start, ast.AssignerDereference{}, false
 	}
 	s.skip(t.Kind)
@@ -175,6 +176,19 @@ func parseCallInAssignList(s scan) (scan, ast.AssignListChild) {
 		parseNewlineInExprList,
 	)
 }
+
+func parseCast(s scan) (scan, ast.Cast) {
+	t := s.take(token.WordUpper, "cast: type name expected")
+
+	s.take(token.ParenLeft, "cast: opening paren expected")
+	s, expr := parseAnyExpr(s, true)
+	s.take(token.ParenRight, "cast: closing paren expected")
+
+	return s, ast.Cast{t.Pos(), t.Source, expr, s.last}
+}
+
+func parseCastInAssignList(s scan) (scan, ast.AssignListChild) { return parseCast(s) }
+func parseCastInExpr(s scan) (scan, ast.ExprChild)             { return parseCast(s) }
 
 func parseCharacter(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.Character, "character literal expected")
@@ -234,7 +248,7 @@ func parsePointerDereference(s scan) (scan, ast.ExprChild) {
 
 func parseSelectorOnly(s scan) (scan, ast.Selector) {
 	pos := s.pos()
-	name := s.take(token.Word, "selector: variable name expected")
+	name := s.take(token.WordLower, "selector: variable name expected")
 
 	var names []string
 
@@ -245,7 +259,7 @@ func parseSelectorOnly(s scan) (scan, ast.Selector) {
 			return s, ast.Selector{pos, names, s.last}
 		}
 
-		name = s.take(token.Word, "selector: field name expected")
+		name = s.take(token.WordLower, "selector: field name expected")
 	}
 }
 

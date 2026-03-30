@@ -53,7 +53,8 @@ const (
 	True
 
 	// Identifier, or keyword at file level or in type definition
-	Word
+	WordLower
+	WordUpper
 
 	// Basic type literals
 	Integer   // 12345
@@ -131,7 +132,8 @@ var strings = [...]string{
 	Return:   "return",
 	True:     "true",
 
-	Word: "Word",
+	WordLower: "WordLower",
+	WordUpper: "WordUpper",
 
 	Integer:   "Integer",
 	Character: "Character",

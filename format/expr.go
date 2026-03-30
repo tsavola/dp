@@ -52,6 +52,13 @@ func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight b
 			formatExprList(w, level, node.Pos().Line, node.Args, true)
 		},
 
+		func(node ast.Cast) {
+			w.WriteString(node.Name)
+			w.WriteString("(")
+			formatExpr(w, level, node.Expr, 0, false)
+			w.WriteString(")")
+		},
+
 		func(node ast.Character) {
 			w.WriteString(node.Source)
 		},

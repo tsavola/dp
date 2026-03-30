@@ -6,6 +6,7 @@ package ast
 func VisitAssignListChild(x AssignListChild,
 	visitAssigner func(AssignerDereference),
 	visitCall func(Call),
+	visitCast func(Cast),
 	visitIndex func(Index),
 	visitSelector func(Selector),
 ) {
@@ -14,6 +15,8 @@ func VisitAssignListChild(x AssignListChild,
 		visitAssigner(x)
 	case Call:
 		visitCall(x)
+	case Cast:
+		visitCast(x)
 	case Index:
 		visitIndex(x)
 	case Selector:
@@ -72,6 +75,7 @@ func VisitExpr(x ExprChild,
 	visitBinary func(Binary),
 	visitBoolean func(Boolean),
 	visitCall func(Call),
+	visitCast func(Cast),
 	visitCharacter func(Character),
 	visitClone func(Clone),
 	visitEmpty func(Empty),
@@ -92,6 +96,8 @@ func VisitExpr(x ExprChild,
 		visitBoolean(x)
 	case Call:
 		visitCall(x)
+	case Cast:
+		visitCast(x)
 	case Character:
 		visitCharacter(x)
 	case Clone:

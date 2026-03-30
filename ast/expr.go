@@ -94,6 +94,20 @@ func (x Call) Dump() string {
 	return s + ")}"
 }
 
+type Cast struct {
+	At    source.Position
+	Name  string
+	Expr  ExprChild
+	EndAt source.Position
+}
+
+func (Cast) Node() string           { return "Cast" }
+func (Cast) assignListChild()       {}
+func (Cast) exprChild()             {}
+func (x Cast) Pos() source.Position { return x.At }
+func (x Cast) End() source.Position { return x.EndAt }
+func (x Cast) Dump() string         { return "Cast{" + x.Expr.Dump() + "}" }
+
 type Character struct {
 	At     source.Position
 	Source string

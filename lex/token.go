@@ -43,7 +43,8 @@ next:
 			tokenizer(token.Return, "return", wordRune),
 			tokenizer(token.True, "true", wordRune),
 
-			tokenizeWord,
+			wordTokenizer(token.WordLower, false),
+			wordTokenizer(token.WordUpper, true),
 
 			tokenizeInteger,
 			quoteTokenizer(token.Character, '\''),
@@ -139,18 +140,20 @@ func tokenizeComment(s scan) (scan, token.Token) {
 	}
 }
 
-func tokenizeWord(s scan) (scan, token.Token) {
-	start := s
+func wordTokenizer(k token.Kind, upper bool) func(scan) (scan, token.Token) {
+	return func(s scan) (scan, token.Token) {
+		start := s
 
-	if !wordStartRune(s.peek()) {
-		pan.Panic(tokenError(start))
-	}
+		if r := s.peek(); !wordStartRune(r) || unicode.IsUpper(r) != upper {
+			pan.Panic(tokenError(start))
+		}
 
-	for {
-		s.advance()
+		for {
+			s.advance()
 
-		if !wordRune(s.peek()) {
-			return makeToken(token.Word, start, s)
+			if !wordRune(s.peek()) {
+				return makeToken(k, start, s)
+			}
 		}
 	}
 }

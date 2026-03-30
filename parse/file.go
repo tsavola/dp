@@ -41,10 +41,10 @@ func parseConstantDef(s scan) (scan, ast.FileChild) {
 	var public bool
 	var name token.Token
 
-	t := s.take(token.Word, "constant definition: pub keyword or name expected")
+	t := s.take(token.WordLower, "constant definition: pub keyword or name expected")
 	if t.Source == "pub" {
 		public = true
-		name = s.take(token.Word, "constant definition: name expected")
+		name = s.take(token.WordLower, "constant definition: name expected")
 	} else {
 		name = t
 	}
@@ -56,7 +56,7 @@ func parseConstantDef(s scan) (scan, ast.FileChild) {
 }
 
 func parseFieldAccess(s scan) (scan, field.Access) {
-	if t, ok := s.skim(token.Word); ok {
+	if t, ok := s.skim(token.WordLower); ok {
 		switch t.Source {
 		case "visible":
 			return s, field.AccessVisible
@@ -71,7 +71,7 @@ func parseFieldAccess(s scan) (scan, field.Access) {
 }
 
 func parseFieldInFieldList(s scan) (scan, ast.FieldListChild) {
-	name := s.take(token.Word, "field name expected")
+	name := s.take(token.WordLower, "field name expected")
 	s, spec := parseTypeSpec(s)
 	s, access := parseFieldAccess(s)
 	return s, ast.Field{name.Pos(), name.Source, spec, access, s.last}
@@ -87,13 +87,13 @@ func parseFunctionDef(s scan) (scan, ast.FileChild) {
 		name   string
 	)
 
-	if t := s.peek(); t.Kind == token.Word && t.Source == "pub" {
-		s.skip(token.Word)
+	if t := s.peek(); t.Kind == token.WordLower && t.Source == "pub" {
+		s.skip(token.WordLower)
 		public = true
 	}
 
 	if s.skip(token.ParenLeft) {
-		rName = s.take(token.Word, "function definition: receiver name expected").Source
+		rName = s.take(token.WordLower, "function definition: receiver name expected").Source
 
 		var t ast.TypeSpec
 		s, t = parseTypeSpec(s)
@@ -101,11 +101,11 @@ func parseFunctionDef(s scan) (scan, ast.FileChild) {
 
 		s.take(token.ParenRight, "function definition: receiver: closing paren expected")
 
-		if t, ok := s.skim(token.Word); ok {
+		if t, ok := s.skim(token.WordLower); ok {
 			name = t.Source
 		}
 	} else {
-		name = s.take(token.Word, "function definition: name expected").Source
+		name = s.take(token.WordLower, "function definition: name expected").Source
 	}
 
 	s.take(token.ParenLeft, "function definition: parameter list expected")
@@ -248,7 +248,7 @@ func parseImports(s scan) (scan, ast.FileChild) {
 }
 
 func parseParamInParamList(s scan) (scan, ast.ParamListChild) {
-	name := s.take(token.Word, "parameter name expected")
+	name := s.take(token.WordLower, "parameter name expected")
 
 	// Missing type is filled in by parseFunctionDef().
 	var spec ast.TypeSpec
@@ -261,16 +261,15 @@ func parseParamInParamList(s scan) (scan, ast.ParamListChild) {
 }
 
 func parseTypeDef(s scan) (scan, ast.FileChild) {
-	var public bool
-	var name token.Token
+	pos := s.pos()
 
-	t := s.take(token.Word, "type definition: pub keyword or name expected")
-	if t.Source == "pub" {
+	var public bool
+	if t := s.peek(); t.Kind == token.WordLower && t.Source == "pub" {
 		public = true
-		name = s.take(token.Word, "type definition: name expected")
-	} else {
-		name = t
+		s.skip(token.WordLower)
 	}
+
+	name := s.take(token.WordUpper, "type definition: name expected")
 
 	s, access := parseFieldAccess(s)
 
@@ -286,7 +285,7 @@ func parseTypeDef(s scan) (scan, ast.FileChild) {
 
 	body = fillInTypeFieldAccess(body, access)
 
-	return s, ast.TypeDef{t.Pos(), public, name.Source, body, s.last}
+	return s, ast.TypeDef{pos, public, name.Source, body, s.last}
 }
 
 func fillInTypeFieldAccess(nodes []ast.FieldListChild, fallback field.Access) []ast.FieldListChild {

@@ -32,6 +32,7 @@ func parseAssign(s scan) (scan, ast.BlockChild) {
 	s, names := parseNakedList(s, token.Assign,
 		parseAssignerDereferenceInAssignList,
 		parseCallInAssignList,
+		parseCastInAssignList,
 		parseCommaInAssignList,
 		parseIndexInAssignList,
 		parseSelectorInAssignList,
@@ -164,6 +165,6 @@ func parseVariableDef(s scan) (scan, ast.BlockChild) {
 }
 
 func parseVariableName(s scan) (scan, string) {
-	name := s.take(token.Word, "variable name expected")
+	name := s.take(token.WordLower, "variable name expected")
 	return s, name.Source
 }

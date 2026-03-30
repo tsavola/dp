@@ -16,7 +16,11 @@ func parseQualifiedName(s scan) (scan, ast.QualifiedName) {
 	}
 
 	for {
-		name = append(name, s.take(token.Word, "name expected").Source)
+		t, ok := s.skim(token.WordLower)
+		if !ok {
+			t = s.take(token.WordUpper, "name expected")
+		}
+		name = append(name, t.Source)
 
 		if !s.skip(token.Colons) {
 			return s, name

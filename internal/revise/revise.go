@@ -34,6 +34,10 @@ func reviseAssignList(olds []old.AssignListChild) (news []new.AssignListChild) {
 				news = append(news, reviseCall(node))
 			},
 
+			func(node old.Cast) {
+				news = append(news, reviseCast(node))
+			},
+
 			func(node old.Index) {
 				news = append(news, reviseIndex(node))
 			},
@@ -163,6 +167,10 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 
 		func(node old.Call) {
 			result = reviseCall(node)
+		},
+
+		func(node old.Cast) {
+			result = reviseCast(node)
 		},
 
 		func(node old.Character) {
@@ -418,6 +426,15 @@ func reviseCall(node old.Call) new.Call {
 	return new.Call{
 		reviseSelector(node.Name),
 		reviseExprList(node.Args),
+		node.EndAt,
+	}
+}
+
+func reviseCast(node old.Cast) new.Cast {
+	return new.Cast{
+		node.At,
+		node.Name,
+		reviseExpr(node.Expr),
 		node.EndAt,
 	}
 }
