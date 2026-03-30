@@ -177,6 +177,10 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 			}
 		},
 
+		func(node old.Empty) {
+			result = new.Empty{node.At, node.EndAt}
+		},
+
 		func(node old.Index) {
 			result = reviseIndex(node)
 		},
@@ -212,10 +216,6 @@ func reviseExpr(node old.ExprChild) (result new.ExprChild) {
 				reviseExpr(node.Expr),
 				node.EndAt,
 			}
-		},
-
-		func(node old.Zero) {
-			result = new.Zero{node.At, node.EndAt}
 		},
 	)
 	return

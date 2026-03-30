@@ -61,6 +61,10 @@ func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight b
 			formatExpr(w, level, node.Expr, ast.UltimatePrecedence, tight)
 		},
 
+		func(node ast.Empty) {
+			w.WriteString("{}")
+		},
+
 		func(node ast.Index) {
 			w.WriteString(node.Name.String())
 			w.WriteString("[")
@@ -99,10 +103,6 @@ func formatExpr(w writer, level int, node ast.ExprChild, parentPrec int, tight b
 				w.WriteString(node.Op.String())
 				formatExpr(w, level, node.Expr, ast.UltimatePrecedence, tight)
 			}
-		},
-
-		func(node ast.Zero) {
-			w.WriteString("{}")
 		},
 	)
 }

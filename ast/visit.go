@@ -74,6 +74,7 @@ func VisitExpr(x ExprChild,
 	visitCall func(Call),
 	visitCharacter func(Character),
 	visitClone func(Clone),
+	visitEmpty func(Empty),
 	visitIndex func(Index),
 	visitInteger func(Integer),
 	visitNil func(Nil),
@@ -81,7 +82,6 @@ func VisitExpr(x ExprChild,
 	visitSelector func(Selector),
 	visitString func(String),
 	visitUnary func(Unary),
-	visitZero func(Zero),
 ) {
 	switch x := x.(type) {
 	case Address:
@@ -96,6 +96,8 @@ func VisitExpr(x ExprChild,
 		visitCharacter(x)
 	case Clone:
 		visitClone(x)
+	case Empty:
+		visitEmpty(x)
 	case Index:
 		visitIndex(x)
 	case Integer:
@@ -110,12 +112,7 @@ func VisitExpr(x ExprChild,
 		visitString(x)
 	case Unary:
 		visitUnary(x)
-	case Zero:
-		visitZero(x)
 	default:
-		if true {
-			panic(x)
-		}
 		panic("unknown expression child node type")
 	}
 }

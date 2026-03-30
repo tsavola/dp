@@ -117,6 +117,17 @@ func (x Clone) Pos() source.Position { return x.At }
 func (x Clone) End() source.Position { return x.EndAt }
 func (x Clone) Dump() string         { return "Clone{" + x.Expr.Dump() + "}" }
 
+type Empty struct {
+	At    source.Position
+	EndAt source.Position
+}
+
+func (Empty) Node() string           { return "Empty" }
+func (Empty) exprChild()             {}
+func (x Empty) Pos() source.Position { return x.At }
+func (x Empty) End() source.Position { return x.EndAt }
+func (Empty) Dump() string           { return "Empty" }
+
 type Index struct {
 	Name  Selector
 	Index ExprChild
@@ -201,14 +212,3 @@ func (Unary) exprChild()             {}
 func (x Unary) Pos() source.Position { return x.At }
 func (x Unary) End() source.Position { return x.EndAt }
 func (x Unary) Dump() string         { return "Unary{" + x.Op.Dump() + " " + x.Expr.Dump() + "}" }
-
-type Zero struct {
-	At    source.Position
-	EndAt source.Position
-}
-
-func (Zero) Node() string           { return "Zero" }
-func (Zero) exprChild()             {}
-func (x Zero) Pos() source.Position { return x.At }
-func (x Zero) End() source.Position { return x.EndAt }
-func (Zero) Dump() string           { return "Zero" }

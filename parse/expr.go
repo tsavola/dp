@@ -86,6 +86,7 @@ func parseAtomicExpr(s scan) (scan, ast.ExprChild) {
 		parseCallInExpr,
 		parseCharacter,
 		parseClone,
+		parseEmpty,
 		parseFalse,
 		parseIndexInExpr,
 		parseInteger,
@@ -96,7 +97,6 @@ func parseAtomicExpr(s scan) (scan, ast.ExprChild) {
 		parseString,
 		parseTrue,
 		parseUnary,
-		parseZero,
 	)
 }
 
@@ -185,6 +185,12 @@ func parseClone(s scan) (scan, ast.ExprChild) {
 	t := s.take(token.Clone, "clone keyword expected")
 	s, expr := parseAtomicExpr(s)
 	return s, ast.Clone{t.Pos(), expr, s.last}
+}
+
+func parseEmpty(s scan) (scan, ast.ExprChild) {
+	t := s.take(token.BraceLeft, "empty: opening brace expected")
+	s.take(token.BraceRight, "empty: closing brace expected")
+	return s, ast.Empty{t.Pos(), s.last}
 }
 
 func parseFalse(s scan) (scan, ast.ExprChild) {
@@ -276,10 +282,4 @@ func parseUnary(s scan) (scan, ast.ExprChild) {
 	s, op := parsePrefixOperator(s)
 	s, expr := parseAtomicExpr(s)
 	return s, ast.Unary{pos, op, expr, s.last}
-}
-
-func parseZero(s scan) (scan, ast.ExprChild) {
-	t := s.take(token.BraceLeft, "zero: opening brace expected")
-	s.take(token.BraceRight, "zero: closing brace expected")
-	return s, ast.Zero{t.Pos(), s.last}
 }
